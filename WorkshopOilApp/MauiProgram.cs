@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Maui;
 using Microsoft.Extensions.Logging;
+using WorkshopOilApp.Services;
 
 namespace WorkshopOilApp
 {
@@ -20,6 +21,9 @@ namespace WorkshopOilApp
 #if DEBUG
     		builder.Logging.AddDebug();
 #endif
+
+            // Register DB Service
+            builder.Services.AddSingleton(DatabaseService.Instance);
 
             return builder.Build();
         }

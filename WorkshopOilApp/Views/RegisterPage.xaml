@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="WorkshopOilApp.Views.RegisterPage"
+             Title="RegisterPage">
+    <ScrollView>
+        <VerticalStackLayout Padding="30" Spacing="15">
+            <Label Text="Create Workshop Account" FontSize="24" FontAttributes="Bold" HorizontalOptions="Center" />
+
+            <Entry Placeholder="Given Name" Text="{Binding GivenName}" />
+            <Entry Placeholder="Last Name" Text="{Binding LastName}" />
+            <Entry Placeholder="Business Name" Text="{Binding BusinessName}" />
+            <Entry Placeholder="Username" Text="{Binding Username}" />
+            <Entry Placeholder="Passcode (for password recovery)" IsPassword="True" Text="{Binding PassCode}" />
+            <Entry Placeholder="Password" IsPassword="True" Text="{Binding Password}" />
+            <Entry Placeholder="Confirm Password" IsPassword="True" Text="{Binding ConfirmPassword}" />
+            <Entry Placeholder="Business Contact (Phone)" Text="{Binding BusinessContact}" Keyboard="Telephone" />
+            <Entry Placeholder="Business Email (optional)" Text="{Binding BusinessEmail}" Keyboard="Email" />
+
+            <Label Text="{Binding ErrorMessage}" TextColor="Red" IsVisible="{Binding HasError}" />
+
+            <Button Text="Register" 
+                    Command="{Binding RegisterCommand}"
+                    BackgroundColor="#10B981" 
+                    TextColor="White"
+                    CornerRadius="12" 
+                    HeightRequest="55"
+                    IsEnabled="{Binding IsNotBusy}" />
+
+            <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" Color="#10B981" />
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>
