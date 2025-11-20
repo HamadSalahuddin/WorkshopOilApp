@@ -1,0 +1,131 @@
+# User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Ww][Ii][Nn]32/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Oo]ut/
+msbuild.log
+msbuild.err
+msbuild.wrn
+
+# Visual Studio directory
+.vs/
+.vscode/
+
+# MAUI specific build outputs
+**/Resources/Raw/**/*.css
+**/Resources/Raw/**/*.scss
+**/Resources/Raw/**/*.sass
+
+# Android
+*.apk
+*.aab
+*.ap_
+*.aab
+*.idsig
+*.keystore
+*.mf
+
+# iOS/macOS
+*.ipa
+*.dSYM.zip
+*.dSYM
+[Dd]erivedData/
+*.mobileprovision
+*.bcsymbolmap
+**/*.xcent
+
+# MSTest test Results
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
+
+# NUnit
+*.VisualState.xml
+TestResult.xml
+nunit-*.xml
+
+# .NET Core
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# Tizen
+[Tt]izen/
+
+# Package Files
+*.nupkg
+*.snupkg
+
+# Visual Studio 2022 Enterprise specific
+**/*.backup.*
+**/*.tmp
+*.cache
+*.tss
+
+# Code analysis
+*.lastcodeanalysissucceeded
+
+# LiveShare
+*.vsls.json
+*.vsls
+
+# Application Insight
+ApplicationInsights.config
+
+# JetBrains Rider (if used alongside VS)
+.idea/
+*.sln.iml
+
+# Android Studio
+.gradle/
+local.properties
+*.iml
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# MAUI Hot Reload
+.hotrestart
+
+# Local development settings
+appsettings.Development.json
+appsettings.local.json
+app secrets.json
+
+# Certificate files (keep these secure!)
+*.p12
+*.pfx
+*.pem
+*.cer
+
+# VS Enterprise IntelliCode
+.vs/IntelliCode/
+
+# VS Enterprise Test Impact
+*.testimpact
+
+# VS Enterprise CodeLens
+*.code-lens
+
+#bak file
+*.bak
