@@ -16,7 +16,7 @@ namespace WorkshopOilApp.Models
         [NotNull]
         public string LastName { get; set; } = string.Empty;
 
-        [NotNull, Unique, Indexed]
+        [NotNull, Unique]
         public string UserName { get; set; } = string.Empty;
 
         [NotNull]

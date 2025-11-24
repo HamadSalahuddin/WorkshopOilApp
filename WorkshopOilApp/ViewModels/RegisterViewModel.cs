@@ -4,6 +4,8 @@ using CommunityToolkit.Mvvm.Input;
 using WorkshopOilApp.Models;
 using WorkshopOilApp.Services;
 
+namespace WorkshopOilApp.ViewModels;
+
 public partial class RegisterViewModel : ObservableObject
 {
     // All [ObservableProperty] fields...
@@ -23,7 +25,7 @@ public partial class RegisterViewModel : ObservableObject
     private readonly AuthService _authService = new();
 
     [RelayCommand]
-    async Task Register()
+    public async Task Register()
     {
         HasError = false;
         if (Password != ConfirmPassword)

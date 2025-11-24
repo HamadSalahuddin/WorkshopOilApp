@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:WorkshopOilApp.ViewModels"
+             x:Class="WorkshopOilApp.Views.CustomerListPage"
+             Title="Customers"
+             BackgroundColor="#F8FAFC"
+             x:DataType="vm:CustomerListViewModel">
+
+    <ContentPage.BindingContext>
+        <vm:CustomerListViewModel />
+    </ContentPage.BindingContext>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- Search Bar -->
+        <SearchBar Placeholder="Search by name or registration..."
+                   Text="{Binding SearchText, Mode=TwoWay}"
+                   TextChanged="OnSearchTextChanged"
+                   Margin="10,10,10,0" />
+
+        <!-- Main List -->
+        <RefreshView Grid.Row="1"
+                     Command="{Binding RefreshCommand}"
+                     IsRefreshing="{Binding IsRefreshing}">
+                           
+            <CollectionView ItemsSource="{Binding Customers}"
+                            RemainingItemsThresholdReachedCommand="{Binding LoadMoreCommand}"
+                RemainingItemsThreshold="3">
+
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="vm:CustomerCardViewModel">
+                        <Frame Margin="12,6" 
+                               CornerRadius="16"
+                               HasShadow="True"
+                               BackgroundColor="White"
+                               Padding="16">
+
+                            <Grid ColumnDefinitions="*,Auto">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+
+                                <!-- Name + Phone -->
+                                <Label Grid.Row="0" Grid.Column="0"
+                                       Text="{Binding FullName}"
+                                       FontSize="18"
+                                       FontAttributes="Bold"
+                                       TextColor="#1E293B" />
+
+                                <Label Grid.Row="0" Grid.Column="1"
+                                       Text="{Binding PhoneContact}"
+                                       FontSize="14"
+                                       TextColor="#64748B" />
+
+                                <!-- Vehicles Summary -->
+                                <Label Grid.Row="1" Grid.Column="0"
+                                       Text="{Binding VehicleSummary}"
+                                       FontSize="14"
+                                       TextColor="#475569" />
+
+                                <!-- Due Status Badge -->
+                                <Frame Grid.Row="2" Grid.Column="0"
+                                       BackgroundColor="{Binding StatusColor}"
+                                       CornerRadius="20"
+                                       Padding="10,6"
+                                       HorizontalOptions="Start">
+                                    <Label Text="{Binding StatusText}"
+                                           TextColor="White"
+                                           FontSize="13"
+                                           FontAttributes="Bold" />
+                                </Frame>
+
+                                <!-- Days Left -->
+                                <Label Grid.Row="2" Grid.Column="1"
+                                       Text="{Binding DaysText}"
+                                       FontSize="14"
+                                       TextColor="{Binding DaysTextColor}"
+                                       HorizontalOptions="End" />
+
+                            </Grid>
+
+                            <!-- Tap to open detail -->
+                            <Frame.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:CustomerListViewModel}}, Path=SelectCustomerCommand}"
+                                                      CommandParameter="{Binding}" />
+                            </Frame.GestureRecognizers>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+
+                <!-- Empty State -->
+                <CollectionView.EmptyView>
+                    <VerticalStackLayout Padding="30" Spacing="20">
+                        <Image Source="empty_customers.png" HeightRequest="120" Opacity="0.6" />
+                        <Label Text="No customers yet" FontSize="20" HorizontalOptions="Center" />
+                        <Label Text="Tap + to add your first customer" 
+                               TextColor="#64748B" 
+                               HorizontalOptions="Center" />
+                    </VerticalStackLayout>
+                </CollectionView.EmptyView>
+                <!-- Add Footer to show loading state -->
+                <CollectionView.Footer>
+                    <Grid HeightRequest="60" IsVisible="{Binding IsBusy}">
+                        <ActivityIndicator IsRunning="True" 
+                                         Color="#10B981"
+                                         HorizontalOptions="Center"
+                                         VerticalOptions="Center"/>
+                    </Grid>
+                </CollectionView.Footer>
+            </CollectionView>
+            
+        </RefreshView>
+
+        <!-- Floating + Button -->
+        <Button Grid.Row="1"
+                Text="+"
+                FontSize="28"
+                FontAttributes="Bold"
+                TextColor="White"
+                BackgroundColor="#10B981"
+                CornerRadius="30"
+                WidthRequest="60"
+                HeightRequest="60"
+                HorizontalOptions="End"
+                VerticalOptions="End"
+                Margin="20"
+                Command="{Binding AddCustomerCommand}">
+            <Button.Shadow>
+                <Shadow Brush="#10B981" Opacity="0.4" Radius="15" Offset="0,8"/>
+            </Button.Shadow>
+        </Button>
+    </Grid>
+</ContentPage>

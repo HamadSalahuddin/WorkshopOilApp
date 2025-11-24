@@ -1,0 +1,97 @@
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:WorkshopOilApp.ViewModels"
+             x:Class="WorkshopOilApp.Views.AddEditCustomerPage"
+             Title="{Binding PageTitle}"
+             BackgroundColor="#F8FAFC">
+
+    <ContentPage.BindingContext>
+        <vm:AddEditCustomerViewModel />
+    </ContentPage.BindingContext>
+
+    <ScrollView>
+        <VerticalStackLayout Padding="25" Spacing="22">
+
+            <!-- Header Icon -->
+            <Image Source="customer_icon.png" 
+                   HeightRequest="100" 
+                   HorizontalOptions="Center"
+                   Opacity="0.9" />
+
+            <Label Text="{Binding PageTitle}"
+                   FontSize="26"
+                   FontAttributes="Bold"
+                   HorizontalOptions="Center"
+                   TextColor="#1E293B" />
+
+            <!-- Form Fields -->
+            <Frame BackgroundColor="White" CornerRadius="16" HasShadow="True" Padding="18">
+                <VerticalStackLayout Spacing="18">
+
+                    <Entry Placeholder="Given Name *"
+                           Text="{Binding GivenName}"
+                           FontSize="16" />
+
+                    <Entry Placeholder="Last Name *"
+                           Text="{Binding LastName}"
+                           FontSize="16" />
+
+                    <Entry Placeholder="Phone Number *"
+                           Text="{Binding PhoneContact}"
+                           Keyboard="Telephone"
+                           FontSize="16" />
+
+                    <Entry Placeholder="Email Address"
+                           Text="{Binding EmailAddress}"
+                           Keyboard="Email"
+                           FontSize="16" />
+
+                    <Entry Placeholder="Address (optional)"
+                           Text="{Binding Address}"
+                           FontSize="16" />
+
+                    <Editor Placeholder="Notes (optional)"
+                            Text="{Binding Notes}"
+                            HeightRequest="100"
+                            FontSize="15" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Error Message -->
+            <Label Text="{Binding ErrorMessage}"
+                   TextColor="#EF4444"
+                   FontSize="15"
+                   HorizontalOptions="Center"
+                   IsVisible="{Binding HasError}" />
+
+            <!-- Save Button -->
+            <Button Text="{Binding SaveButtonText}"
+                    Command="{Binding SaveCommand}"
+                    BackgroundColor="#10B981"
+                    TextColor="White"
+                    CornerRadius="16"
+                    HeightRequest="56"
+                    FontSize="18"
+                    FontAttributes="Bold"
+                    IsEnabled="{Binding IsNotBusy}">
+                <Button.Shadow>
+                    <Shadow Brush="#10B981" Opacity="0.4" Radius="12" Offset="0,6"/>
+                </Button.Shadow>
+            </Button>
+
+            <!-- Loading -->
+            <ActivityIndicator IsRunning="{Binding IsBusy}"
+                               IsVisible="{Binding IsBusy}"
+                               Color="#10B981"
+                               HorizontalOptions="Center" />
+
+            <!-- Success Message -->
+            <Label Text="Customer saved successfully!"
+                   TextColor="#10B981"
+                   FontSize="16"
+                   FontAttributes="Bold"
+                   HorizontalOptions="Center"
+                   IsVisible="{Binding ShowSuccess}" />
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

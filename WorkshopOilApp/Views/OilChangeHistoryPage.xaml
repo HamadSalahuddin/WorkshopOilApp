@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:WorkshopOilApp.ViewModels"
+             x:Class="WorkshopOilApp.Views.OilChangeHistoryPage"
+             Title="Oil Change History"
+             BackgroundColor="#F8FAFC"
+             x:DataType="vm:OilChangeHistoryViewModel">
+
+    <ContentPage.BindingContext>
+        <vm:OilChangeHistoryViewModel />
+    </ContentPage.BindingContext>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <SearchBar Grid.Row="0" Placeholder="Search history..." Text="{Binding SearchText}" 
+                   SearchCommand="{Binding LoadHistoryCommand}" Margin="10" />
+
+        <RefreshView Grid.Row="1" Command="{Binding RefreshCommand}" IsRefreshing="{Binding IsRefreshing}">
+            <CollectionView ItemsSource="{Binding History}">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Frame Margin="12,6" CornerRadius="14" BackgroundColor="White" HasShadow="True">
+                            <Grid Padding="16" ColumnDefinitions="*,Auto">
+                                <VerticalStackLayout Spacing="8">
+                                    <Label Text="{Binding Lubricant.DisplayName}" FontSize="18" FontAttributes="Bold" />
+                                    <Label Text="{Binding ChangeDateLocal, StringFormat='{}{0:MMM dd, yyyy}'}" FontSize="14" TextColor="#64748B" />
+                                    <Label Text="{Binding MileageAtChange, StringFormat='Mileage: {0:N0} km'}" />
+                                    <Label Text="{Binding Cost, StringFormat='Cost: ${0:F2}'}" IsVisible="{Binding HasCost}" />
+                                    <Label Text="{Binding Notes}" TextColor="#64748B" FontSize="13" IsVisible="{Binding HasNotes}" />
+                                </VerticalStackLayout>
+                                <Label Text="Next:" FontAttributes="Bold" VerticalOptions="Start" />
+                                <Label Text="{Binding NextRecommendedDateLocal, StringFormat='{}{0:MMM dd, yyyy}'}" 
+                                       TextColor="#DC2626" FontSize="14" Grid.Column="1" />
+                            </Grid>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </RefreshView>
+    </Grid>
+</ContentPage>

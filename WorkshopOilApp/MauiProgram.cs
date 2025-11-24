@@ -1,6 +1,5 @@
 ﻿using CommunityToolkit.Maui;
 using Microsoft.Extensions.Logging;
-using WorkshopOilApp.Services;
 
 namespace WorkshopOilApp
 {
@@ -23,7 +22,15 @@ namespace WorkshopOilApp
 #endif
 
             // Register DB Service
-            builder.Services.AddSingleton(DatabaseService.Instance);
+            //builder.Services.AddSingleton(DatabaseService.InstanceAsync);
+
+            //builder.Services.AddSingleton<LoginViewModel>();
+            //builder.Services.AddSingleton<RegisterViewModel>();
+            //builder.Services.AddSingleton<ForgotPasswordPage>();
+
+            //builder.Services.AddSingleton<LoginPage>();
+            //builder.Services.AddSingleton<RegisterPage>();
+            //builder.Services.AddSingleton<ForgotPasswordPage>();
 
             return builder.Build();
         }

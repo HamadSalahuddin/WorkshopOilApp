@@ -1,5 +1,4 @@
-﻿// ViewModels/LoginViewModel.cs
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using WorkshopOilApp.Services;
 using WorkshopOilApp.Views;
@@ -33,7 +32,7 @@ public partial class LoginViewModel : ObservableObject
         if (result.IsSuccess)
         {
             // Navigate to Customers List
-            //await Shell.Current.GoToAsync($"//{nameof(CustomerListPage)}");
+            await Shell.Current.GoToAsync(nameof(CustomerListPage));
         }
         else
         {
