@@ -58,7 +58,7 @@
 
             <CollectionView ItemsSource="{Binding Vehicles}">
                 <CollectionView.ItemTemplate>
-                    <DataTemplate x:DataType="vm:VehicleCardViewModel">
+                    <DataTemplate >
                         <Frame Margin="12,6" CornerRadius="16" BackgroundColor="White" HasShadow="True">
                             <Grid Padding="16" ColumnDefinitions="*,Auto">
                                 <VerticalStackLayout Spacing="8">
@@ -111,14 +111,14 @@
                                 </HorizontalStackLayout>
 
                                 <!-- Tap to view history -->
-                                <Frame>
+                                <!--<Frame>
                                     <Grid Padding="16">
-                                        <!-- all content -->
+                                        --><!-- all content --><!--
                                         <Grid.GestureRecognizers>
                                             <TapGestureRecognizer Command="{Binding Source=..., Path=SelectCustomerCommand}" CommandParameter="{Binding}" />
                                         </Grid.GestureRecognizers>
                                     </Grid>
-                                </Frame>
+                                </Frame>-->
                             </Grid>
                         </Frame>
                     </DataTemplate>
