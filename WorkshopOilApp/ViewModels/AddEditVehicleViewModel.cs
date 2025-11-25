@@ -93,7 +93,6 @@ namespace WorkshopOilApp.ViewModels
             else
             {
                 vehicle = new Vehicle { CustomerId = CustomerId };
-                await db.Db.InsertAsync(vehicle);
             }
 
             vehicle.RegistrationNumber = RegistrationNumber.Trim().ToUpper();

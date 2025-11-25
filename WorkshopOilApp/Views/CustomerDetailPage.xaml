@@ -30,6 +30,9 @@
                     <Label Text="Email:" FontAttributes="Bold" />
                     <Label Text="{Binding Customer.EmailAddress}" TextColor="#64748B" />
                 </HorizontalStackLayout>
+                <Label Text="{Binding VehicleCountText}"
+                       FontSize="16"
+                       TextColor="#475569" />
                 <!-- Inside the header Frame, after the phone/email row -->
                 <HorizontalStackLayout Spacing="15" HorizontalOptions="EndAndExpand">
                     <Button Text="Edit Customer"
@@ -45,10 +48,6 @@
                             TextColor="White"
                             CornerRadius="12" />
                 </HorizontalStackLayout>
-
-                <Label Text="{Binding VehicleCountText}"
-                       FontSize="16"
-                       TextColor="#475569" />
             </VerticalStackLayout>
         </Frame>
 
