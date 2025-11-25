@@ -23,36 +23,53 @@ public partial class AddOilChangeViewModel : ObservableObject, IQueryAttributabl
     [ObservableProperty] bool hasMessage;
 
     private int VehicleId { get; set; }
+    private int CustomerId { get; set; }
 
     public string CustomerName => customer.FullName;
-    public string NextDueText => SelectedLubricant == null ? "Select oil first" : "Recommended interval applied";
-    public string NextDueDateString => SelectedLubricant == null ? "" :
-        ChangeDate.AddMonths(12).AddDays(-7).ToString("MMM dd, yyyy");
+
+    [ObservableProperty]
+    private string _nextDueText = "Select oil first";
+
+    [ObservableProperty]
+    private string _nextDueDateString = "";
+
+    partial void OnSelectedLubricantChanged(Lubricant? oldValue, Lubricant? newValue)
+        => UpdateDuePreview();
+
+    partial void OnChangeDateChanged(DateTime oldValue, DateTime newValue)
+        => UpdateDuePreview();
+
+    private void UpdateDuePreview()
+    {
+        NextDueText = SelectedLubricant == null ? "Select oil first" : "Recommended interval applied";
+        NextDueDateString = SelectedLubricant == null ? "" : ChangeDate.AddMonths(12).ToString("MMM dd, yyyy");
+    }
 
     public void ApplyQueryAttributes(IDictionary<string, object> query)
     {
-        if (query.TryGetValue("customerId", out var cid))
-            _ = LoadDataAsync(Convert.ToInt32(cid), query);
+        CustomerId = Convert.ToInt32(query["customerId"]);
+
+        if (query.TryGetValue("vehicleId", out var vid))
+        {
+            VehicleId = Convert.ToInt32(vid);
+            _ = LoadDataAsync();
+        }
     }
 
-    private async Task LoadDataAsync(int customerId, IDictionary<string, object> query)
+    private async Task LoadDataAsync()
     {
         IsBusy = true;
         var db = await DatabaseService.InstanceAsync;
 
-        Customer = await db.Db.GetWithChildrenAsync<Customer>(customerId);
-        if (query.TryGetValue("vehicleId", out var vid))
-        {
-            var vId = Convert.ToInt32(vid);
-            Vehicle = Customer.Vehicles!.First(v => v.VehicleId == vId);
-            VehicleId = vId;
-        }
+        Customer = await db.Db.GetWithChildrenAsync<Customer>(CustomerId);
+        Vehicle = Customer.Vehicles!.First(v => v.VehicleId == VehicleId);
 
         AvailableLubricants = await db.Db.Table<Lubricant>().ToListAsync();
         SelectedLubricant = AvailableLubricants.FirstOrDefault(l => l.LubricantId == Vehicle.CurrentLubricantId)
                            ?? AvailableLubricants.FirstOrDefault();
 
         IsBusy = false;
+        UpdateDuePreview();
     }
 
     [RelayCommand]

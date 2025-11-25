@@ -49,9 +49,8 @@
             <!-- Next Due Calculation -->
             <Frame BackgroundColor="#EFF6FF" CornerRadius="16" Padding="15">
                 <VerticalStackLayout Spacing="10">
-                    <Label Text="Next Service Due:" FontSize="18" FontAttributes="Bold" TextColor="#1E40AF" />
-                    <Label Text="{Binding NextDueText}" FontSize="20" TextColor="#1D4ED8" />
-                    <Label Text="{Binding NextDueDateString}" FontSize="16" TextColor="#1E40AF" />
+                    <Label Text="{Binding NextDueText}" FontSize="18" TextColor="#1E40AF" />
+                    <Label Text="{Binding NextDueDateString}" FontSize="20" TextColor="#1D4ED8" />
                 </VerticalStackLayout>
             </Frame>
 

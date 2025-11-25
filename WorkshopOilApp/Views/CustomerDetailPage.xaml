@@ -58,7 +58,7 @@
 
             <CollectionView ItemsSource="{Binding Vehicles}">
                 <CollectionView.ItemTemplate>
-                    <DataTemplate >
+                    <DataTemplate x:DataType="vm:VehicleCardViewModel">
                         <Frame Margin="12,6" CornerRadius="16" BackgroundColor="White" HasShadow="True">
                             <Grid Padding="16" ColumnDefinitions="*,Auto">
                                 <VerticalStackLayout Spacing="8">
@@ -74,12 +74,11 @@
                                     <HorizontalStackLayout Spacing="15">
                                         <Label Text="Oil:" FontAttributes="Bold" />
                                         <Label Text="{Binding CurrentOil}" TextColor="#475569" />
-
                                         <Label Text="Capacity:" FontAttributes="Bold" />
                                         <Label Text="{Binding OilCapacity}" TextColor="#475569" />
                                     </HorizontalStackLayout>
 
-                                    <!-- Due Status -->
+                                    <!-- Due Status Badge -->
                                     <Frame BackgroundColor="{Binding StatusColor}"
                                            CornerRadius="20"
                                            Padding="10,6"
@@ -91,34 +90,40 @@
                                     </Frame>
                                 </VerticalStackLayout>
 
-                                <!-- Days / Overdue -->
-                                <Label Text="{Binding DaysText}"
-                                       FontSize="16"
-                                       TextColor="{Binding DaysTextColor}"
-                                       VerticalOptions="Center"
-                                       HorizontalOptions="End" />
+                                <!-- Days Left + Buttons Column -->
+                                <VerticalStackLayout Grid.Column="1" Spacing="8" VerticalOptions="Center">
+                                    <Label Text="{Binding DaysText}"
+                                           FontSize="16"
+                                           TextColor="{Binding DaysTextColor}"
+                                           HorizontalOptions="End" />
 
-                                <!-- Inside the vehicle card Grid, add this -->
-                                <HorizontalStackLayout Grid.Column="1" VerticalOptions="Start" Spacing="10">
-                                    <Button Text="Edit"
-                                            FontSize="12"
-                                            Padding="8,4"
-                                            BackgroundColor="#6366F1"
-                                            TextColor="White"
-                                            CornerRadius="8"
-                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:CustomerDetailViewModel}}, Path=EditVehicleCommand}"
-                                            CommandParameter="{Binding}" />
-                                </HorizontalStackLayout>
+                                    <!-- Action Buttons -->
+                                    <HorizontalStackLayout Spacing="8" HorizontalOptions="End">
+                                        <Button Text="History"
+                                                FontSize="12"
+                                                Padding="10,6"
+                                                BackgroundColor="#64748B"
+                                                TextColor="White"
+                                                CornerRadius="8"
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type vm:CustomerDetailViewModel}}, Path=ViewOilHistoryCommand}"
+                                                CommandParameter="{Binding}" />
 
-                                <!-- Tap to view history -->
-                                <!--<Frame>
-                                    <Grid Padding="16">
-                                        --><!-- all content --><!--
-                                        <Grid.GestureRecognizers>
-                                            <TapGestureRecognizer Command="{Binding Source=..., Path=SelectCustomerCommand}" CommandParameter="{Binding}" />
-                                        </Grid.GestureRecognizers>
-                                    </Grid>
-                                </Frame>-->
+                                        <Button Text="+ Oil Change"
+                                                FontSize="12"
+                                                Padding="10,6"
+                                                BackgroundColor="#3B82F6"
+                                                TextColor="White"
+                                                CornerRadius="8"
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type vm:CustomerDetailViewModel}}, Path=AddOilChangeForVehicleCommand}"
+                                                CommandParameter="{Binding}" />
+                                    </HorizontalStackLayout>
+                                </VerticalStackLayout>
+
+                                <!-- Tap entire card to view history (optional) -->
+                                <Grid.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:CustomerDetailViewModel}}, Path=ViewOilHistoryCommand}"
+                                  CommandParameter="{Binding}" />
+                                </Grid.GestureRecognizers>
                             </Grid>
                         </Frame>
                     </DataTemplate>
@@ -132,25 +137,6 @@
                     </VerticalStackLayout>
                 </CollectionView.EmptyView>
             </CollectionView>
-        </RefreshView>
-
-        <!-- Floating Add Oil Change Button -->
-        <Button Grid.Row="1"
-                Text="+ Add Oil Change"
-                FontSize="16"
-                FontAttributes="Bold"
-                TextColor="White"
-                BackgroundColor="#3B82F6"
-                CornerRadius="30"
-                HeightRequest="56"
-                Padding="20,0"
-                HorizontalOptions="Center"
-                VerticalOptions="End"
-                Margin="20"
-                Command="{Binding AddOilChangeCommand}">
-            <Button.Shadow>
-                <Shadow Brush="#3B82F6" Opacity="0.4" Radius="15" Offset="0,8"/>
-            </Button.Shadow>
-        </Button>
+        </RefreshView>        
     </Grid>
 </ContentPage>
