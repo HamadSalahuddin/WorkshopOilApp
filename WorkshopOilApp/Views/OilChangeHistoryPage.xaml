@@ -23,7 +23,7 @@
         <RefreshView Grid.Row="1" Command="{Binding RefreshCommand}" IsRefreshing="{Binding IsRefreshing}">
             <CollectionView ItemsSource="{Binding History}">
                 <CollectionView.ItemTemplate>
-                    <DataTemplate>
+                    <DataTemplate x:DataType="vm:AddOilChangeViewModel">
                         <Frame Margin="12,6" CornerRadius="14" BackgroundColor="White" HasShadow="True">
                             <Grid Padding="16" ColumnDefinitions="*,Auto">
                                 <VerticalStackLayout Spacing="8">
@@ -32,10 +32,12 @@
                                     <Label Text="{Binding MileageAtChange, StringFormat='Mileage: {0:N0} km'}" />
                                     <Label Text="{Binding Cost, StringFormat='Cost: ${0:F2}'}" IsVisible="{Binding HasCost}" />
                                     <Label Text="{Binding Notes}" TextColor="#64748B" FontSize="13" IsVisible="{Binding HasNotes}" />
+                                    <Label Text="Next:" FontAttributes="Bold" VerticalOptions="Start" />
                                 </VerticalStackLayout>
-                                <Label Text="Next:" FontAttributes="Bold" VerticalOptions="Start" />
-                                <Label Text="{Binding NextRecommendedDateLocal, StringFormat='{}{0:MMM dd, yyyy}'}" 
-                                       TextColor="#DC2626" FontSize="14" Grid.Column="1" />
+                               
+                                 <Label Text="{Binding NextRecommendedDateLocal, StringFormat='{}{0:MMM dd, yyyy}'}" 
+                                       TextColor="#DC2626" FontSize="14" Grid.Column="1"
+                                        VerticalOptions="End"/>
                             </Grid>
                         </Frame>
                     </DataTemplate>

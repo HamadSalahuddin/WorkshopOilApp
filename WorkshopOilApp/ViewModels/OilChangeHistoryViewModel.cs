@@ -1,7 +1,6 @@
 ﻿// ViewModels/OilChangeHistoryViewModel.cs
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using SQLiteNetExtensionsAsync.Extensions;
 using System.Collections.ObjectModel;
 using WorkshopOilApp.Models;
 using WorkshopOilApp.Services;
@@ -37,11 +36,13 @@ public partial class OilChangeHistoryViewModel : ObservableObject, IQueryAttribu
             .OrderByDescending(r => r.ChangeDate)
             .ToListAsync();
 
-        await db.Db.GetChildrenAsync(records);
-
         History.Clear();
         foreach (var r in records)
+        {
+            r.Lubricant = await db.Db.GetAsync<Lubricant>(lubricant => lubricant.LubricantId == r.LubricantId);
+
             History.Add(r);
+        }
 
         IsRefreshing = false;
     }

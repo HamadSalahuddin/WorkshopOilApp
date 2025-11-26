@@ -33,7 +33,7 @@
                     HeightRequest="55"
                     IsEnabled="{Binding IsNotBusy}" />
 
-            <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" Color="#10B981" />
+            <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" Color="#3B82F6" />
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>

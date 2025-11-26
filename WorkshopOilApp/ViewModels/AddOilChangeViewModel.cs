@@ -17,10 +17,16 @@ public partial class AddOilChangeViewModel : ObservableObject, IQueryAttributabl
     [ObservableProperty] double mileage;
     [ObservableProperty] double cost;
     [ObservableProperty] string notes = "";
-    [ObservableProperty] string message = "";
-    [ObservableProperty] Color messageColor = Colors.Green;
     [ObservableProperty] bool isBusy;
-    [ObservableProperty] bool hasMessage;
+    [ObservableProperty] private DateTime nextRecommendedDate;
+    [ObservableProperty] private string nextRecommendedKm = "";
+    [ObservableProperty] private string saveErrorMessage = "";
+    [ObservableProperty] private bool hasSaveError;
+
+    [ObservableProperty] private bool nextDateErrorVisible;
+    [ObservableProperty] private bool nextKmErrorVisible;
+
+    public DateTime MinimumNextDate => ChangeDate.AddDays(7);
 
     private int VehicleId { get; set; }
     private int CustomerId { get; set; }
@@ -41,8 +47,8 @@ public partial class AddOilChangeViewModel : ObservableObject, IQueryAttributabl
 
     private void UpdateDuePreview()
     {
-        NextDueText = SelectedLubricant == null ? "Select oil first" : "Recommended interval applied";
-        NextDueDateString = SelectedLubricant == null ? "" : ChangeDate.AddMonths(12).ToString("MMM dd, yyyy");
+        NextRecommendedDate = ChangeDate.AddMonths(12);  // default suggestion
+        OnPropertyChanged(nameof(MinimumNextDate));
     }
 
     public void ApplyQueryAttributes(IDictionary<string, object> query)
@@ -67,7 +73,8 @@ public partial class AddOilChangeViewModel : ObservableObject, IQueryAttributabl
         AvailableLubricants = await db.Db.Table<Lubricant>().ToListAsync();
         SelectedLubricant = AvailableLubricants.FirstOrDefault(l => l.LubricantId == Vehicle.CurrentLubricantId)
                            ?? AvailableLubricants.FirstOrDefault();
-
+        NextRecommendedDate = ChangeDate.AddMonths(12);
+        
         IsBusy = false;
         UpdateDuePreview();
     }
@@ -75,26 +82,55 @@ public partial class AddOilChangeViewModel : ObservableObject, IQueryAttributabl
     [RelayCommand]
     async Task Save()
     {
+        SaveErrorMessage = "";
+        HasSaveError = false;
+        NextDateErrorVisible = false;
+        NextKmErrorVisible = false;
+        // Required fields
         if (SelectedLubricant == null)
         {
-            Message = "Please select an oil type";
-            MessageColor = Colors.Red;
-            HasMessage = true;
+            SaveErrorMessage = "Please select an oil type";
+            HasSaveError = true;
             return;
         }
 
+        if (Mileage <= 0)
+        {
+            SaveErrorMessage = "Please enter current mileage";
+            HasSaveError = true;
+            return;
+        }
+
+        // Business rule: Next date ≥ ChangeDate + 7 days
+        if (NextRecommendedDate < ChangeDate.AddDays(7))
+        {
+            NextDateErrorVisible = true;
+            SaveErrorMessage = "Next service date must be at least 7 days after change date";
+            HasSaveError = true;
+        }
+
+        // Business rule: Next Km ≥ current + 500
+        if (!double.TryParse(NextRecommendedKm, out var nextKm) || nextKm < Mileage + 500)
+        {
+            NextKmErrorVisible = true;
+            SaveErrorMessage = "Next recommended km must be at least 500 km more than current";
+            HasSaveError = true;
+        }
+
+        if (HasSaveError) return;
+
         IsBusy = true;
-        HasMessage = false;
 
         var record = new OilChangeRecord
         {
-            VehicleId = VehicleId,
+            VehicleId = Vehicle.VehicleId,
             LubricantId = SelectedLubricant.LubricantId,
             ChangeDate = ChangeDate.ToUniversalTime().ToString("o"),
-            MileageAtChange = mileage,
-            Cost = cost > 0 ? cost : null,
-            Notes = notes,
-            NextRecommendedDate = ChangeDate.AddMonths(12).ToString("o"),  // or use vehicle interval
+            MileageAtChange = Mileage,
+            Cost = !string.IsNullOrWhiteSpace(Cost.ToString()) ? Cost : null,
+            Notes = string.IsNullOrWhiteSpace(Notes) ? null : Notes,
+            NextRecommendedDate = NextRecommendedDate.ToUniversalTime().ToString("o"),
+            NextRecommendedKm = nextKm,
             CreatedAt = DateTime.UtcNow.ToString("o")
         };
 
@@ -105,12 +141,8 @@ public partial class AddOilChangeViewModel : ObservableObject, IQueryAttributabl
         Vehicle.CurrentLubricantId = SelectedLubricant.LubricantId;
         await db.Db.UpdateAsync(Vehicle);
 
-        Message = "Oil change saved successfully!";
-        MessageColor = Colors.Green;
-        HasMessage = true;
         IsBusy = false;
 
-        await Task.Delay(1500);
         await Shell.Current.GoToAsync("..");  // back to customer detail
     }
 }

@@ -38,6 +38,7 @@ public partial class CustomerDetailViewModel : ObservableObject, IQueryAttributa
         var db = await DatabaseService.InstanceAsync;
 
         Customer = await db.Db.GetWithChildrenAsync<Customer>(CustomerId, recursive: true);
+
         if (Customer == null) return;
 
         Vehicles.Clear();
@@ -46,6 +47,12 @@ public partial class CustomerDetailViewModel : ObservableObject, IQueryAttributa
             var latest = vehicle.OilChangeRecords?
                 .OrderByDescending(r => r.ChangeDate)
                 .FirstOrDefault();
+
+            var currentLubricant = vehicle.CurrentLubricantId != null 
+                ? await db.Db.GetAsync<Lubricant>(l => l.LubricantId == vehicle.CurrentLubricantId)
+                : null;
+
+            vehicle.CurrentLubricant = currentLubricant;
 
             Vehicles.Add(new VehicleCardViewModel(vehicle, latest));
         }

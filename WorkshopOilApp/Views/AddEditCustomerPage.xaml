@@ -82,7 +82,7 @@
             <!-- Loading -->
             <ActivityIndicator IsRunning="{Binding IsBusy}"
                                IsVisible="{Binding IsBusy}"
-                               Color="#10B981"
+                               Color="#3B82F6"
                                HorizontalOptions="Center" />
 
             <!-- Success Message -->

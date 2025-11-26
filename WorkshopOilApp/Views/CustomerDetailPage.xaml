@@ -74,6 +74,8 @@
                                     <HorizontalStackLayout Spacing="15">
                                         <Label Text="Oil:" FontAttributes="Bold" />
                                         <Label Text="{Binding CurrentOil}" TextColor="#475569" />
+                                    </HorizontalStackLayout>
+                                    <HorizontalStackLayout Spacing="15">
                                         <Label Text="Capacity:" FontAttributes="Bold" />
                                         <Label Text="{Binding OilCapacity}" TextColor="#475569" />
                                     </HorizontalStackLayout>
@@ -98,25 +100,31 @@
                                            HorizontalOptions="End" />
 
                                     <!-- Action Buttons -->
-                                    <HorizontalStackLayout Spacing="8" HorizontalOptions="End">
-                                        <Button Text="History"
-                                                FontSize="12"
-                                                Padding="10,6"
-                                                BackgroundColor="#64748B"
-                                                TextColor="White"
-                                                CornerRadius="8"
-                                                Command="{Binding Source={RelativeSource AncestorType={x:Type vm:CustomerDetailViewModel}}, Path=ViewOilHistoryCommand}"
-                                                CommandParameter="{Binding}" />
+                                    <Button Text="Edit"
+                                            FontSize="12"
+                                            Padding="8,4"
+                                            BackgroundColor="#6366F1"
+                                            TextColor="White"
+                                            CornerRadius="8"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:CustomerDetailViewModel}}, Path=EditVehicleCommand}"
+                                            CommandParameter="{Binding}" />
+                                    <Button Text="History"
+                                            FontSize="12"
+                                            Padding="10,6"
+                                            BackgroundColor="#64748B"
+                                            TextColor="White"
+                                            CornerRadius="8"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:CustomerDetailViewModel}}, Path=ViewOilHistoryCommand}"
+                                            CommandParameter="{Binding}" />
 
-                                        <Button Text="+ Oil Change"
-                                                FontSize="12"
-                                                Padding="10,6"
-                                                BackgroundColor="#3B82F6"
-                                                TextColor="White"
-                                                CornerRadius="8"
-                                                Command="{Binding Source={RelativeSource AncestorType={x:Type vm:CustomerDetailViewModel}}, Path=AddOilChangeForVehicleCommand}"
-                                                CommandParameter="{Binding}" />
-                                    </HorizontalStackLayout>
+                                    <Button Text="+ Oil Change"
+                                            FontSize="12"
+                                            Padding="10,6"
+                                            BackgroundColor="#3B82F6"
+                                            TextColor="White"
+                                            CornerRadius="8"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:CustomerDetailViewModel}}, Path=AddOilChangeForVehicleCommand}"
+                                            CommandParameter="{Binding}" />
                                 </VerticalStackLayout>
 
                                 <!-- Tap entire card to view history (optional) -->

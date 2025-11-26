@@ -47,10 +47,34 @@
             </Frame>
 
             <!-- Next Due Calculation -->
-            <Frame BackgroundColor="#EFF6FF" CornerRadius="16" Padding="15">
-                <VerticalStackLayout Spacing="10">
-                    <Label Text="{Binding NextDueText}" FontSize="18" TextColor="#1E40AF" />
-                    <Label Text="{Binding NextDueDateString}" FontSize="20" TextColor="#1D4ED8" />
+            <Frame BackgroundColor="#EFF6FF" CornerRadius="16" Padding="18" HasShadow="True">
+                <VerticalStackLayout Spacing="15">
+                    <Label Text="Next Service Recommendation" FontSize="18" FontAttributes="Bold" TextColor="#1E40AF" />
+
+                    <!-- Next Date -->
+                    <Grid ColumnDefinitions="120,*">
+                        <Label Text="Next Date:" FontAttributes="Bold" VerticalOptions="Center" />
+                        <DatePicker Grid.Column="1" 
+                                    Date="{Binding NextRecommendedDate}" 
+                                    MinimumDate="{Binding MinimumNextDate}" />
+                    </Grid>
+                    <Label Text="Must be at least 7 days after change date" 
+                           FontSize="12" 
+                           TextColor="#DC2626" 
+                           IsVisible="{Binding NextDateErrorVisible}" />
+
+                    <!-- Next Km -->
+                    <Grid ColumnDefinitions="120,*">
+                        <Label Text="Next Km:" FontAttributes="Bold" VerticalOptions="Center" />
+                        <Entry Grid.Column="1" 
+                               Text="{Binding NextRecommendedKm}" 
+                               Keyboard="Numeric"
+                               Placeholder="e.g. 165000" />
+                    </Grid>
+                    <Label Text="Must be at least 500 km more than current mileage" 
+                           FontSize="12" 
+                           TextColor="#DC2626" 
+                           IsVisible="{Binding NextKmErrorVisible}" />
                 </VerticalStackLayout>
             </Frame>
 
@@ -76,14 +100,14 @@
                 </Button.Shadow>
             </Button>
 
-            <!-- Loading / Success -->
-            <Label Text="{Binding Message}"
-                   TextColor="{Binding MessageColor}"
-                   FontSize="16"
-                   HorizontalOptions="Center"
-                   IsVisible="{Binding HasMessage}" />
+            <!-- Error Summary -->
+            <Label Text="{Binding SaveErrorMessage}" 
+                   TextColor="#DC2626" 
+                   FontSize="15" 
+                   HorizontalOptions="Center" 
+                   IsVisible="{Binding HasSaveError}" />
 
-            <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" Color="#10B981" />
+            <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" Color="#3B82F6" />
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>
