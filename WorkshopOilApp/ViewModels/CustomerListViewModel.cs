@@ -6,6 +6,7 @@ using System.Collections.ObjectModel;
 using WorkshopOilApp.Models;
 using WorkshopOilApp.Services;
 using WorkshopOilApp.Views;
+
 namespace WorkshopOilApp.ViewModels;
 
 public partial class CustomerListViewModel : ObservableObject
