@@ -73,7 +73,7 @@
 
                                     <HorizontalStackLayout Spacing="15">
                                         <Label Text="Oil:" FontAttributes="Bold" />
-                                        <Label Text="{Binding CurrentOil}" TextColor="#475569" />
+                                        <Label Text="{Binding CurrentOil}" TextColor="#475569" WidthRequest="190" />
                                     </HorizontalStackLayout>
                                     <HorizontalStackLayout Spacing="15">
                                         <Label Text="Capacity:" FontAttributes="Bold" />
