@@ -37,6 +37,4 @@ public partial class CustomerListPage : ContentPage
             }
         }
     }
-
-
 }
