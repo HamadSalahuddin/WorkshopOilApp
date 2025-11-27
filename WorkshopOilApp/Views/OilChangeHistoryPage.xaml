@@ -4,45 +4,114 @@
              xmlns:vm="clr-namespace:WorkshopOilApp.ViewModels"
              x:Class="WorkshopOilApp.Views.OilChangeHistoryPage"
              Title="Oil Change History"
-             BackgroundColor="#F8FAFC"
-             x:DataType="vm:OilChangeHistoryViewModel">
+             BackgroundColor="#F8FAFC">
 
     <ContentPage.BindingContext>
         <vm:OilChangeHistoryViewModel />
     </ContentPage.BindingContext>
 
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
+    <Grid RowDefinitions="Auto,*">
+        <!-- Date Range Filter Card -->
+        <Frame Grid.Row="0" BackgroundColor="White" Margin="12,10" CornerRadius="16" HasShadow="True">
+            <VerticalStackLayout Padding="18" Spacing="15">
+                <Label Text="Filter by Date Range" FontSize="18" FontAttributes="Bold" TextColor="#1E293B" />
 
-        <SearchBar Grid.Row="0" Placeholder="Search history..." Text="{Binding SearchText}" 
-                   SearchCommand="{Binding LoadHistoryCommand}" Margin="10" />
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="15">
+                    <VerticalStackLayout>
+                        <Label Text="From Date" FontSize="14" FontAttributes="Bold" />
+                        <DatePicker Date="{Binding StartDate}"
+                                    MaximumDate="{Binding Today}"
+                                    Format="dd MMM yyyy" />
+                    </VerticalStackLayout>
 
-        <RefreshView Grid.Row="1" Command="{Binding RefreshCommand}" IsRefreshing="{Binding IsRefreshing}">
-            <CollectionView ItemsSource="{Binding History}">
-                <CollectionView.ItemTemplate>
-                    <DataTemplate x:DataType="vm:AddOilChangeViewModel">
-                        <Frame Margin="12,6" CornerRadius="14" BackgroundColor="White" HasShadow="True">
-                            <Grid Padding="16" ColumnDefinitions="*,Auto">
-                                <VerticalStackLayout Spacing="8">
-                                    <Label Text="{Binding Lubricant.DisplayName}" FontSize="18" FontAttributes="Bold" />
-                                    <Label Text="{Binding ChangeDateLocal, StringFormat='{}{0:MMM dd, yyyy}'}" FontSize="14" TextColor="#64748B" />
-                                    <Label Text="{Binding MileageAtChange, StringFormat='Mileage: {0:N0} km'}" />
-                                    <Label Text="{Binding Cost, StringFormat='Cost: ${0:F2}'}" IsVisible="{Binding HasCost}" />
-                                    <Label Text="{Binding Notes}" TextColor="#64748B" FontSize="13" IsVisible="{Binding HasNotes}" />
-                                    <Label Text="Next:" FontAttributes="Bold" VerticalOptions="Start" />
-                                </VerticalStackLayout>
-                               
-                                 <Label Text="{Binding NextRecommendedDateLocal, StringFormat='{}{0:MMM dd, yyyy}'}" 
-                                       TextColor="#DC2626" FontSize="14" Grid.Column="1"
-                                        VerticalOptions="End"/>
-                            </Grid>
-                        </Frame>
-                    </DataTemplate>
-                </CollectionView.ItemTemplate>
-            </CollectionView>
-        </RefreshView>
+                    <VerticalStackLayout Grid.Column="1">
+                        <Label Text="To Date" FontSize="14" FontAttributes="Bold" />
+                        <DatePicker Date="{Binding EndDate}"
+                                    MaximumDate="{Binding Today}"
+                                    MinimumDate="{Binding StartDate}"
+                                    Format="dd MMM yyyy" />
+                    </VerticalStackLayout>
+                </Grid>
+
+                <Button Text="Apply Filter"
+                        Command="{Binding ApplyFilterCommand}"
+                        BackgroundColor="#3B82F6"
+                        TextColor="White"
+                        CornerRadius="12"
+                        HeightRequest="48" />
+            </VerticalStackLayout>
+        </Frame>
+
+        <!-- History List with Pull-to-Refresh + Pagination -->
+        <!--<RefreshView Grid.Row="1"
+                     Command="{Binding RefreshCommand}"
+                     IsRefreshing="{Binding IsRefreshing }">-->
+
+        <CollectionView ItemsSource="{Binding History}"
+                        Grid.Row="1"
+                        RemainingItemsThreshold="5"
+                        RemainingItemsThresholdReachedCommand="{Binding LoadMoreCommand}">
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="vm:OilChangeCardViewModel">
+                    <Frame Margin="12,6" CornerRadius="16" BackgroundColor="White" HasShadow="True">
+                        <Grid Padding="18" ColumnDefinitions="*,Auto">
+                            <VerticalStackLayout Spacing="10">
+                                <Label Text="{Binding LubricantName}"
+                                       FontSize="18"
+                                       FontAttributes="Bold"
+                                       TextColor="#1E293B" />
+
+                                <Label Text="{Binding DateDisplay}"
+                                       FontSize="15"
+                                       TextColor="#64748B" />
+
+                                <HorizontalStackLayout Spacing="20">
+                                    <Label Text="{Binding MileageDisplay}" />
+                                    <Label Text="{Binding CostDisplay}" 
+                                            IsVisible="{Binding HasCost}" />
+                                </HorizontalStackLayout>
+
+                                <Label Text="{Binding NotesToDisplay}" 
+                                       TextColor="#64748B"
+                                       FontSize="14"
+                                       IsVisible="{Binding HasNotes}" />
+                            </VerticalStackLayout>
+
+                            <Frame BackgroundColor="{Binding NextDueColor}"
+                                   CornerRadius="20"
+                                   Padding="12,8"
+                                   HeightRequest="40"
+                                   VerticalOptions="Start"
+                                   Grid.Column="1">
+                                <Label Text="{Binding NextDueDisplay}"
+                                       TextColor="White"
+                                       FontSize="13"
+                                       FontAttributes="Bold" />
+                            </Frame>
+                        </Grid>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+
+            <CollectionView.EmptyView>
+                <VerticalStackLayout Padding="40" Spacing="20">
+                    <Image Source="no_history.png" HeightRequest="120" Opacity="0.6" />
+                    <Label Text="No oil changes found" FontSize="20" HorizontalOptions="Center" />
+                    <Label Text="Try adjusting the date range" TextColor="#64748B" HorizontalOptions="Center" />
+                </VerticalStackLayout>
+            </CollectionView.EmptyView>
+
+            <!-- Add Footer to show loading state -->
+            <CollectionView.Footer>
+                <Grid HeightRequest="60" IsVisible="{Binding IsBusy}">
+                    <ActivityIndicator IsRunning="True" 
+                         Color="#3B82F6"
+                         HorizontalOptions="Center"
+                         VerticalOptions="Center"/>
+                </Grid>
+            </CollectionView.Footer>
+        </CollectionView>
+        <!--</RefreshView>-->
     </Grid>
 </ContentPage>
