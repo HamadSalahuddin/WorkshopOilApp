@@ -109,7 +109,7 @@
                 <CollectionView.Footer>
                     <Grid HeightRequest="60" IsVisible="{Binding IsBusy}">
                         <ActivityIndicator IsRunning="True" 
-                                         Color="#10B981"
+                                         Color="#3B82F6"
                                          HorizontalOptions="Center"
                                          VerticalOptions="Center"/>
                     </Grid>
