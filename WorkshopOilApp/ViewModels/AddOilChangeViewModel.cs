@@ -73,7 +73,7 @@ public partial class AddOilChangeViewModel : ObservableObject, IQueryAttributabl
         AvailableLubricants = await db.Db.Table<Lubricant>().ToListAsync();
         SelectedLubricant = AvailableLubricants.FirstOrDefault(l => l.LubricantId == Vehicle.CurrentLubricantId)
                            ?? AvailableLubricants.FirstOrDefault();
-        NextRecommendedDate = ChangeDate.AddMonths(12);
+        NextRecommendedDate = ChangeDate.AddMonths(3);
         
         IsBusy = false;
         UpdateDuePreview();
