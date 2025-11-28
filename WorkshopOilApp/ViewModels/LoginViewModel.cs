@@ -48,4 +48,80 @@ public partial class LoginViewModel : ObservableObject
 
     [RelayCommand]
     async Task GoToForgotPassword() => await Shell.Current.GoToAsync(nameof(ForgotPasswordPage));
+
+    [RelayCommand]
+    async Task BackupDatabase()
+    {
+        try
+        {
+            // Database ka original path lein
+            string asliPath = GetDatabasePath();
+
+            // Check karen ke database file hai ke nahi
+            if (!File.Exists(asliPath))
+            {
+                await Shell.Current.DisplayAlert("Error", "Database file nahi mili!", "OK");
+                return;
+            }
+
+#if ANDROID
+        // Android phone ke liye
+        string downloadsFolder = Path.Combine(
+            Android.OS.Environment.ExternalStorageDirectory.AbsolutePath, 
+            Android.OS.Environment.DirectoryDownloads
+        );
+        
+        string nayiPath = Path.Combine(downloadsFolder, "copied_database.db3");
+        
+        // File copy karen
+        File.Copy(asliPath, nayiPath, true);
+        
+        await Shell.Current.DisplayAlert("Success", 
+            $"Database copy ho gayi!\nLocation: {nayiPath}", "OK");
+
+#elif WINDOWS
+        // Windows computer ke liye
+        string downloadsFolder = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "\\Downloads";
+        string nayiPath = Path.Combine(downloadsFolder, "copied_database.db3");
+        
+        File.Copy(asliPath, nayiPath, true);
+        await Shell.Current.DisplayAlert("Success", "Database Downloads folder mein copy ho gayi", "OK");
+
+#elif IOS
+        // iPhone ke liye - Share option use karen
+        //await ShareFile(asliPath);
+#endif
+        }
+        catch (Exception ex)
+        {
+            await Shell.Current.DisplayAlert("Error", $"Copy nahi ho payi: {ex.Message}", "OK");
+        }
+    }
+
+    public string GetDatabasePath()
+    {
+        string databaseName = "WorkshopDb.db3";
+        string databasePath = string.Empty;
+
+#if ANDROID
+    databasePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), databaseName);
+#elif IOS
+    databasePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "..", "Library", databaseName);
+#elif WINDOWS
+    // Windows ke liye
+    databasePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), databaseName);
+#endif
+
+        return databasePath;
+    }
+
+    // iOS ke liye file share karen
+    public async Task ShareFile(string filePath)
+    {
+        await Share.Default.RequestAsync(new ShareFileRequest
+        {
+            Title = "Database File",
+            File = new ShareFile(filePath)
+        });
+    }
 }

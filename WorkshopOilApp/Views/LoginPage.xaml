@@ -83,6 +83,15 @@
                         <TapGestureRecognizer Command="{Binding GoToForgotPasswordCommand}" />
                     </Label.GestureRecognizers>
                 </Label>
+                <Label Text="|" TextColor="#94A3B8" />
+
+                <Label Text="Backup" 
+                       TextColor="#3B82F6" 
+                       FontAttributes="Bold">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding BackupDatabaseCommand}" />
+                    </Label.GestureRecognizers>
+                </Label>
             </HorizontalStackLayout>
 
             <!-- Loading Indicator -->
