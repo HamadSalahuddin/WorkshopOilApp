@@ -38,14 +38,18 @@ namespace WorkshopOilApp.ViewModels
         public void ApplyQueryAttributes(IDictionary<string, object> query)
         {
             CustomerId = Convert.ToInt32(query["customerId"]);
-            if (query.TryGetValue("vehicleId", out var vid))
+            Task.Run(async () =>
             {
-                VehicleId = Convert.ToInt32(vid);
-                PageTitle = "Edit Vehicle";
-                SaveButtonText = "Save Changes";
-                _ = LoadVehicleAsync();
-            }
-            _ = LoadLubricantsAsync();
+                await LoadLubricantsAsync();
+            
+                if (query.TryGetValue("vehicleId", out var vid))
+                {
+                    VehicleId = Convert.ToInt32(vid);
+                    PageTitle = "Edit Vehicle";
+                    SaveButtonText = "Save Changes";
+                    await LoadVehicleAsync();
+                }
+            });
         }
 
         private async Task LoadLubricantsAsync()
