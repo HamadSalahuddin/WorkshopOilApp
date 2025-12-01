@@ -57,6 +57,16 @@
                      IsRefreshing="{Binding IsRefreshing}">
 
             <CollectionView ItemsSource="{Binding Vehicles}">
+                <!-- Add Header to show loading state -->
+                <CollectionView.Header>
+                    <Grid HeightRequest="60" IsVisible="{Binding IsBusy}">
+                        <ActivityIndicator 
+                            IsRunning="True" 
+                            Color="#3B82F6"
+                            HorizontalOptions="Center"
+                            VerticalOptions="Center"/>
+                    </Grid>
+                </CollectionView.Header>
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="vm:VehicleCardViewModel">
                         <Frame Margin="12,6" CornerRadius="16" BackgroundColor="White" HasShadow="True">

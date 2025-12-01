@@ -15,6 +15,7 @@ public partial class CustomerDetailViewModel : ObservableObject, IQueryAttributa
     [ObservableProperty] ObservableCollection<VehicleCardViewModel> vehicles = new();
     [ObservableProperty] string vehicleCountText = "";
     [ObservableProperty] bool isRefreshing;
+    [ObservableProperty] bool isBusy;
 
     private int CustomerId { get; set; }
 
@@ -28,20 +29,33 @@ public partial class CustomerDetailViewModel : ObservableObject, IQueryAttributa
 
     public async void OnAppearing()
     {
+        if (Vehicles.Count == 0 && !IsBusy)
+        {
+            await LoadCustomerWithVehiclesAsync();
+        }
+    }
+
+    [RelayCommand]
+    public async Task LoadCustomerWithVehiclesAsync()
+    {
+        if (IsBusy) return;
+
+        IsBusy = true;
+        Vehicles.Clear();
         await LoadCustomerAsync();
+        IsBusy = false;
     }
 
     [RelayCommand]
     async Task LoadCustomerAsync()
     {
-        IsRefreshing = true;
         var db = await DatabaseService.InstanceAsync;
 
         Customer = await db.Db.GetWithChildrenAsync<Customer>(CustomerId, recursive: true);
 
         if (Customer == null) return;
 
-        Vehicles.Clear();
+        
         foreach (var vehicle in Customer.Vehicles ?? new())
         {
             var latest = vehicle.OilChangeRecords?
@@ -60,12 +74,16 @@ public partial class CustomerDetailViewModel : ObservableObject, IQueryAttributa
         VehicleCountText = Customer.Vehicles?.Count == 1
             ? "1 vehicle registered"
             : $"{Customer.Vehicles?.Count ?? 0} vehicles registered";
-
-        IsRefreshing = false;
     }
 
     [RelayCommand]
-    async Task Refresh() => await LoadCustomerAsync();
+    async Task Refresh()
+    {
+        IsRefreshing = true;
+        Vehicles.Clear();
+        await LoadCustomerWithVehiclesAsync();
+        IsRefreshing = false;
+    }
 
     [RelayCommand]
     async Task ViewOilHistory(VehicleCardViewModel card)
