@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:WorkshopOilApp.ViewModels"
+             x:Class="WorkshopOilApp.Views.AddEditLubricantPage"
+             Title="{Binding PageTitle}"
+             BackgroundColor="#F8FAFC">
+
+    <ContentPage.BindingContext>
+        <vm:AddEditLubricantViewModel />
+    </ContentPage.BindingContext>
+
+    <ScrollView>
+        <VerticalStackLayout Padding="25" Spacing="20">
+
+            <Image Source="oil_bottle.png" HeightRequest="100" HorizontalOptions="Center" />
+
+            <Label Text="{Binding PageTitle}"
+                   FontSize="26"
+                   FontAttributes="Bold"
+                   HorizontalOptions="Center"
+                   TextColor="#1E293B" />
+
+            <Frame BackgroundColor="White" CornerRadius="16" HasShadow="True" Padding="20">
+                <VerticalStackLayout Spacing="18">
+                    <Entry Placeholder="Oil Name * (e.g. Mobil 1)" 
+                           Text="{Binding Name}" />
+
+                    <Entry Placeholder="Viscosity * (e.g. 5W-30)" 
+                           Text="{Binding Viscosity}" />
+
+                    <Entry Placeholder="API Spec (e.g. SP, CK-4)" 
+                           Text="{Binding ApiSpec}" />
+
+                    <Picker Title="Type *" 
+                            ItemsSource="{Binding OilTypes}"
+                            SelectedItem="{Binding SelectedType}" />
+
+                    <Editor Placeholder="Notes (optional)" 
+                            Text="{Binding Notes}"
+                            HeightRequest="100" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <Label Text="{Binding ErrorMessage}"
+                   TextColor="#EF4444"
+                   IsVisible="{Binding HasError}"
+                   HorizontalOptions="Center" />
+
+            <Button Text="{Binding SaveButtonText}"
+                    Command="{Binding SaveCommand}"
+                    BackgroundColor="#10B981"
+                    TextColor="White"
+                    CornerRadius="16"
+                    HeightRequest="56"
+                    IsEnabled="{Binding IsNotBusy}" />
+
+            <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" Color="#10B981" />
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>
