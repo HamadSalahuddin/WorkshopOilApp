@@ -24,7 +24,7 @@ public partial class CustomerListViewModel : ObservableObject
 
     public async void OnAppearing()
     {
-        if (Customers.Count == 0 && !IsBusy)
+        if (!IsBusy)
         {
             await LoadCustomers();
         }
@@ -107,7 +107,9 @@ public partial class CustomerListViewModel : ObservableObject
             var latestRecord = customer.Vehicles?
                 .SelectMany(v => v.OilChangeRecords ?? new List<OilChangeRecord>())
                 .OrderByDescending(r => r.ChangeDate)
-                .FirstOrDefault();
+                .GroupBy(oil => oil.VehicleId)
+                .Select(kvp => kvp.First())
+                .ToList();
 
             cards.Add(new CustomerCardViewModel(customer, latestRecord));
         }

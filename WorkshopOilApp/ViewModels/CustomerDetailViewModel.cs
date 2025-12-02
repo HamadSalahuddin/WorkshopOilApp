@@ -29,7 +29,7 @@ public partial class CustomerDetailViewModel : ObservableObject, IQueryAttributa
 
     public async void OnAppearing()
     {
-        if (Vehicles.Count == 0 && !IsBusy)
+        if (!IsBusy)
         {
             await LoadCustomerWithVehiclesAsync();
         }

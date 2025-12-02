@@ -27,7 +27,7 @@
         <RefreshView Grid.Row="1"
                      Command="{Binding RefreshCommand}"
                      IsRefreshing="{Binding IsRefreshing}">
-                           
+
             <CollectionView ItemsSource="{Binding Customers}"
                             RemainingItemsThresholdReachedCommand="{Binding LoadMoreCommand}"
                 RemainingItemsThreshold="3">
@@ -42,6 +42,7 @@
 
                             <Grid ColumnDefinitions="*,Auto">
                                 <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
                                     <RowDefinition Height="Auto" />
                                     <RowDefinition Height="Auto" />
                                     <RowDefinition Height="Auto" />
@@ -65,24 +66,43 @@
                                        FontSize="14"
                                        TextColor="#475569" />
 
-                                <!-- Due Status Badge -->
-                                <Frame Grid.Row="2" Grid.Column="0"
-                                       BackgroundColor="{Binding StatusColor}"
-                                       CornerRadius="20"
-                                       Padding="10,6"
-                                       HorizontalOptions="Start">
-                                    <Label Text="{Binding StatusText}"
-                                           TextColor="White"
-                                           FontSize="13"
-                                           FontAttributes="Bold" />
-                                </Frame>
-
-                                <!-- Days Left -->
-                                <Label Grid.Row="2" Grid.Column="1"
-                                       Text="{Binding DaysText}"
-                                       FontSize="14"
-                                       TextColor="{Binding DaysTextColor}"
-                                       HorizontalOptions="End" />
+                                <CollectionView Grid.Row="2"
+                                                ItemsSource="{Binding VehicleStatuses}"
+                                                Grid.ColumnSpan="2">
+                                    <CollectionView.ItemTemplate>
+                                        <DataTemplate x:DataType="vm:VehicleEngineOilStatus">
+                                            <Grid ColumnDefinitions="*,Auto">
+                                                <Border Grid.Column="0"
+                                                       BackgroundColor="{Binding StatusColor}"
+                                                       Padding="10,6"
+                                                       HorizontalOptions="Start">
+                                                    <Border.StrokeShape>
+                                                        <RoundRectangle CornerRadius="20" />
+                                                    </Border.StrokeShape>
+                                                    <Label Text="{Binding StatusText}"
+                                                           TextColor="White"
+                                                           FontSize="13"
+                                                           FontAttributes="Bold" />
+                                                </Border>
+                                                <VerticalStackLayout Grid.Column="1">
+                                                    <Label  Text="{Binding Registration}"
+                                                            FontSize="12"
+                                                            TextColor="#64748B" 
+                                                            HorizontalOptions="Start"
+                                                            WidthRequest="90"/>
+                                                    <!-- Days Left -->
+                                                    <Label Grid.Column="1"
+                                                           Text="{Binding DaysText}"
+                                                           FontSize="14"
+                                                           TextColor="{Binding DaysTextColor}"
+                                                           WidthRequest="90"
+                                                           HorizontalOptions="Start" />
+                                                </VerticalStackLayout>
+                                                
+                                            </Grid>
+                                        </DataTemplate>
+                                    </CollectionView.ItemTemplate>
+                                </CollectionView>
 
                             </Grid>
 
@@ -115,7 +135,7 @@
                     </Grid>
                 </CollectionView.Footer>
             </CollectionView>
-            
+
         </RefreshView>
 
         <!-- Floating + Button -->

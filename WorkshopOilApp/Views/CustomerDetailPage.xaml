@@ -23,18 +23,20 @@
                        FontAttributes="Bold"
                        TextColor="#1E293B" />
 
-                <HorizontalStackLayout Spacing="20">
+                <HorizontalStackLayout Spacing="5">
                     <Label Text="Phone:" FontAttributes="Bold" />
                     <Label Text="{Binding Customer.PhoneContact}" />
-
+                </HorizontalStackLayout>
+                <HorizontalStackLayout Spacing="5">
                     <Label Text="Email:" FontAttributes="Bold" />
                     <Label Text="{Binding Customer.EmailAddress}" TextColor="#64748B" />
                 </HorizontalStackLayout>
+                
                 <Label Text="{Binding VehicleCountText}"
                        FontSize="16"
                        TextColor="#475569" />
                 <!-- Inside the header Frame, after the phone/email row -->
-                <HorizontalStackLayout Spacing="15" HorizontalOptions="EndAndExpand">
+                <HorizontalStackLayout Spacing="15" HorizontalOptions="Center">
                     <Button Text="Edit Customer"
                             Command="{Binding EditCustomerCommand}"
                             BackgroundColor="#6366F1"

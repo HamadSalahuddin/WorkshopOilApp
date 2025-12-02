@@ -1,5 +1,6 @@
 ﻿// ViewModels/CustomerCardViewModel.cs
 using CommunityToolkit.Mvvm.ComponentModel;
+using System.Collections.ObjectModel;
 using WorkshopOilApp.Models;
 
 namespace WorkshopOilApp.ViewModels;
@@ -8,15 +9,11 @@ public partial class CustomerCardViewModel : ObservableObject
 {
     [ObservableProperty] string fullName;
     [ObservableProperty] string phoneContact;
-    [ObservableProperty] string vehicleSummary;
-    [ObservableProperty] string statusText;
-    [ObservableProperty] Color statusColor;
-    [ObservableProperty] string daysText;
-    [ObservableProperty] Color daysTextColor;
+    [ObservableProperty] string vehicleSummary;[ObservableProperty] ObservableCollection<VehicleEngineOilStatus> vehicleStatuses = new();
 
     public Customer Customer { get; }
 
-    public CustomerCardViewModel(Customer customer, OilChangeRecord? latestRecord)
+    public CustomerCardViewModel(Customer customer, List<OilChangeRecord> latestRecords)
     {
         Customer = customer;
         FullName = customer.FullName;
@@ -27,37 +24,55 @@ public partial class CustomerCardViewModel : ObservableObject
         VehicleSummary = count == 0 ? "No vehicles" :
                         count == 1 ? "1 vehicle" : $"{count} vehicles";
 
-        if (latestRecord == null)
+        if (latestRecords == null ||
+            latestRecords.Count == 0
+        )
         {
-            StatusText = "No Oil Change";
-            StatusColor = Colors.Gray;
-            DaysText = "-";
-            DaysTextColor = Colors.Gray;
+            var vechileEngineOilStatus = new VehicleEngineOilStatus();
+            vechileEngineOilStatus.StatusText = "No Oil Change";
+            vechileEngineOilStatus.StatusColor = Colors.Gray;
+            vechileEngineOilStatus.DaysText = "-";
+            vechileEngineOilStatus.DaysTextColor = Colors.Gray;
             return;
         }
 
-        var daysUntilDue = (latestRecord.NextRecommendedDateLocal - DateTime.Today).Value.Days;
+        foreach (var latestRecord in latestRecords)
+        {
+            var daysUntilDue = (latestRecord.NextRecommendedDateLocal - DateTime.Today).Value.Days;
+            var vehicleEngineOilStatus = new VehicleEngineOilStatus();
+            vehicleEngineOilStatus.Registration = latestRecord.Vehicle.RegistrationNumber;
+            if (daysUntilDue < 0)
+            {
+                vehicleEngineOilStatus.StatusText = "OVERDUE";
+                vehicleEngineOilStatus.StatusColor = Colors.Red;
+                vehicleEngineOilStatus.DaysText = $"{Math.Abs(daysUntilDue)} days ago";
+                vehicleEngineOilStatus.DaysTextColor = Colors.Red;
+            }
+            else if (daysUntilDue <= 7)
+            {
+                vehicleEngineOilStatus.StatusText = "DUE SOON";
+                vehicleEngineOilStatus.StatusColor = Colors.Orange;
+                vehicleEngineOilStatus.DaysText = $"{daysUntilDue} days left";
+                vehicleEngineOilStatus.DaysTextColor = Colors.Orange;
+            }
+            else
+            {
+                vehicleEngineOilStatus.StatusText = "ON TRACK";
+                vehicleEngineOilStatus.StatusColor = Colors.Green;
+                vehicleEngineOilStatus.DaysText = $"{daysUntilDue} days left";
+                vehicleEngineOilStatus.DaysTextColor = Colors.Green;
+            }
 
-        if (daysUntilDue < 0)
-        {
-            StatusText = "OVERDUE";
-            StatusColor = Colors.Red;
-            DaysText = $"{Math.Abs(daysUntilDue)} days ago";
-            DaysTextColor = Colors.Red;
-        }
-        else if (daysUntilDue <= 7)
-        {
-            StatusText = "DUE SOON";
-            StatusColor = Colors.Orange;
-            DaysText = $"{daysUntilDue} days left";
-            DaysTextColor = Colors.Orange;
-        }
-        else
-        {
-            StatusText = "ON TRACK";
-            StatusColor = Colors.Green;
-            DaysText = $"{daysUntilDue} days left";
-            DaysTextColor = Colors.Green;
+            vehicleStatuses.Add(vehicleEngineOilStatus);
         }
     }
+}
+
+public class VehicleEngineOilStatus
+{
+    public string Registration { get; set; }
+    public string StatusText { get; set; }
+    public Color StatusColor { get; set; }
+    public string DaysText { get; set; }
+    public Color DaysTextColor { get; set; }
 }
