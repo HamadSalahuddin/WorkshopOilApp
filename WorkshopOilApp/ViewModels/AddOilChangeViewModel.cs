@@ -135,6 +135,18 @@ public partial class AddOilChangeViewModel : ObservableObject, IQueryAttributabl
         };
 
         var db = await DatabaseService.InstanceAsync;
+        var oilChangeRecordForVechileForSelectedDate = await db.Db.Table<OilChangeRecord>()
+            .Where(oilChangeRecord => oilChangeRecord.ChangeDate == record.ChangeDate)
+            .Where(oilChangeRecord => oilChangeRecord.VehicleId == record.VehicleId)
+            .FirstOrDefaultAsync();
+
+        if (oilChangeRecordForVechileForSelectedDate != null)
+        {
+            SaveErrorMessage = $"Record for {Vehicle.FullModel} on {ChangeDate.Date.ToString("d")} already exists.";
+            HasSaveError = true;
+            IsBusy = false;
+            return;
+        }
         await db.Db.InsertAsync(record);
 
         // Update vehicle's current lubricant
