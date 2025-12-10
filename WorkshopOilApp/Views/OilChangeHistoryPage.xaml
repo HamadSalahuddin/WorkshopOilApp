@@ -4,7 +4,7 @@
              xmlns:vm="clr-namespace:WorkshopOilApp.ViewModels"
              x:Class="WorkshopOilApp.Views.OilChangeHistoryPage"
              Title="Oil Change History"
-             BackgroundColor="#F8FAFC">
+             BackgroundColor="{AppThemeBinding Light=#F8FAFC, Dark={StaticResource Gray950}}">
 
     <ContentPage.BindingContext>
         <vm:OilChangeHistoryViewModel />
@@ -12,9 +12,9 @@
 
     <Grid RowDefinitions="Auto,*">
         <!-- Date Range Filter Card -->
-        <Frame Grid.Row="0" BackgroundColor="White" Margin="12,10" CornerRadius="16" HasShadow="True">
+        <Frame Grid.Row="0" BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray900}}" Margin="12,10" CornerRadius="16" HasShadow="True">
             <VerticalStackLayout Padding="18" Spacing="15">
-                <Label Text="Filter by Date Range" FontSize="18" FontAttributes="Bold" TextColor="#1E293B" />
+                <Label Text="Filter by Date Range" FontSize="18" FontAttributes="Bold" TextColor="{AppThemeBinding Light={StaticResource HeadingColorLight}, Dark={StaticResource HeadingColorDark}}" />
 
                 <Grid ColumnDefinitions="*,*" ColumnSpacing="15">
                     <VerticalStackLayout>
@@ -64,13 +64,13 @@
 
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="vm:OilChangeCardViewModel">
-                    <Frame Margin="12,6" CornerRadius="16" BackgroundColor="White" HasShadow="True">
+                    <Frame Margin="12,6" CornerRadius="16" BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray900}}" HasShadow="True">
                         <Grid Padding="18" ColumnDefinitions="*,Auto">
                             <VerticalStackLayout Spacing="10">
                                 <Label Text="{Binding LubricantName}"
                                        FontSize="18"
                                        FontAttributes="Bold"
-                                       TextColor="#1E293B" />
+                                      TextColor="{AppThemeBinding Light={StaticResource HeadingColorLight}, Dark={StaticResource HeadingColorDark}}" />
 
                                 <Label Text="{Binding DateDisplay}"
                                        FontSize="15"

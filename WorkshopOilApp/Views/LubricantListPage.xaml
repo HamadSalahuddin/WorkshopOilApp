@@ -4,7 +4,7 @@
              xmlns:vm="clr-namespace:WorkshopOilApp.ViewModels"
              x:Class="WorkshopOilApp.Views.LubricantListPage"
              Title="Oil Lubricants"
-             BackgroundColor="#F8FAFC"
+             BackgroundColor="{AppThemeBinding Light=#F8FAFC, Dark={StaticResource Gray950}}"
              x:DataType="vm:LubricantListViewModel">
 
     <ContentPage.BindingContext>
@@ -33,13 +33,13 @@
                             RemainingItemsThresholdReachedCommand="{Binding LoadMoreCommand}">
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="vm:LubricantCardViewModel">
-                        <Frame Margin="12,6" CornerRadius="16" BackgroundColor="White" HasShadow="True">
+                        <Frame Margin="12,6" CornerRadius="16" BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray900}}" HasShadow="True">
                             <Grid Padding="16" ColumnDefinitions="*,Auto">
                                 <VerticalStackLayout Spacing="8">
                                     <Label Text="{Binding Name}"
                                            FontSize="18"
                                            FontAttributes="Bold"
-                                           TextColor="#1E293B" />
+                                          TextColor="{AppThemeBinding Light={StaticResource HeadingColorLight}, Dark={StaticResource HeadingColorDark}}" />
                                     <Label Text="{Binding Viscosity}"
                                            FontSize="16"
                                            TextColor="#64748B" />

@@ -3,7 +3,7 @@
              xmlns:vm="clr-namespace:WorkshopOilApp.ViewModels"
              x:Class="WorkshopOilApp.Views.CustomerDetailPage"
              Title="{Binding Customer.FullName}"
-             BackgroundColor="#F8FAFC">
+             BackgroundColor="{AppThemeBinding Light=#F8FAFC, Dark={StaticResource Gray950}}">
 
     <ContentPage.BindingContext>
         <vm:CustomerDetailViewModel />
@@ -16,12 +16,12 @@
         </Grid.RowDefinitions>
 
         <!-- Customer Header Card -->
-        <Frame Grid.Row="0" Margin="15,10" BackgroundColor="White" CornerRadius="16" HasShadow="True">
+        <Frame Grid.Row="0" Margin="15,10" BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray900}}" CornerRadius="16" HasShadow="True">
             <VerticalStackLayout Padding="20" Spacing="12">
                 <Label Text="{Binding Customer.FullName}"
                        FontSize="24"
                        FontAttributes="Bold"
-                       TextColor="#1E293B" />
+                       TextColor="{AppThemeBinding Light={StaticResource HeadingColorLight}, Dark={StaticResource HeadingColorDark}}" />
 
                 <HorizontalStackLayout Spacing="5">
                     <Label Text="Phone:" FontAttributes="Bold" />
@@ -71,13 +71,13 @@
                 </CollectionView.Header>
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="vm:VehicleCardViewModel">
-                        <Frame Margin="12,6" CornerRadius="16" BackgroundColor="White" HasShadow="True">
+                        <Frame Margin="12,6" CornerRadius="16" BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray900}}" HasShadow="True">
                             <Grid Padding="16" ColumnDefinitions="*,Auto">
                                 <VerticalStackLayout Spacing="8">
                                     <Label Text="{Binding FullModel}"
                                            FontSize="18"
                                            FontAttributes="Bold"
-                                           TextColor="#1E293B" />
+                                          TextColor="{AppThemeBinding Light={StaticResource HeadingColorLight}, Dark={StaticResource HeadingColorDark}}" />
 
                                     <Label Text="{Binding RegistrationNumber}"
                                            FontSize="14"
