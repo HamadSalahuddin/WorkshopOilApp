@@ -17,7 +17,7 @@
 
             <Label Text="{Binding PageTitle}"
                    FontSize="26" FontAttributes="Bold"
-                   HorizontalOptions="Center" TextColor="#1E293B" />
+                   HorizontalOptions="Center" TextColor="{AppThemeBinding Light=#1E293B, Dark=#5271a3}" />
 
             <Frame BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray900}}" CornerRadius="16" HasShadow="True" Padding="18">
                 <VerticalStackLayout Spacing="18">

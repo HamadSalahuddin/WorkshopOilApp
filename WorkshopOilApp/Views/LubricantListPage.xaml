@@ -39,7 +39,7 @@
                                     <Label Text="{Binding Name}"
                                            FontSize="18"
                                            FontAttributes="Bold"
-                                           TextColor="#1E293B" />
+                                           TextColor="{AppThemeBinding Light=#1E293B, Dark=#5271a3}" />
                                     <Label Text="{Binding Viscosity}"
                                            FontSize="16"
                                            TextColor="#64748B" />
