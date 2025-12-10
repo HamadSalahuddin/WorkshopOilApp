@@ -3,7 +3,7 @@
              xmlns:vm="clr-namespace:WorkshopOilApp.ViewModels"
              x:Class="WorkshopOilApp.Views.AddEditCustomerPage"
              Title="{Binding PageTitle}"
-             BackgroundColor="#F8FAFC">
+             BackgroundColor="{AppThemeBinding Light=#F8FAFC, Dark={StaticResource Gray950}}">
 
     <ContentPage.BindingContext>
         <vm:AddEditCustomerViewModel />
@@ -25,7 +25,7 @@
                    TextColor="#1E293B" />
 
             <!-- Form Fields -->
-            <Frame BackgroundColor="White" CornerRadius="16" HasShadow="True" Padding="18">
+            <Frame BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray900}}" CornerRadius="16" HasShadow="True" Padding="18">
                 <VerticalStackLayout Spacing="18">
 
                     <Entry Placeholder="Given Name *"

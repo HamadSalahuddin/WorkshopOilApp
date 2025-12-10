@@ -4,7 +4,7 @@
              xmlns:vm="clr-namespace:WorkshopOilApp.ViewModels"
              x:Class="WorkshopOilApp.Views.AddEditLubricantPage"
              Title="{Binding PageTitle}"
-             BackgroundColor="#F8FAFC">
+             BackgroundColor="{AppThemeBinding Light=#F8FAFC, Dark={StaticResource Gray950}}">
 
     <ContentPage.BindingContext>
         <vm:AddEditLubricantViewModel />
@@ -21,7 +21,7 @@
                    HorizontalOptions="Center"
                    TextColor="#1E293B" />
 
-            <Frame BackgroundColor="White" CornerRadius="16" HasShadow="True" Padding="20">
+            <Frame BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray900}}" CornerRadius="16" HasShadow="True" Padding="20">
                 <VerticalStackLayout Spacing="18">
                     <Entry Placeholder="Oil Name * (e.g. Mobil 1)" 
                            Text="{Binding Name}" />

@@ -3,7 +3,7 @@
              xmlns:vm="clr-namespace:WorkshopOilApp.ViewModels"
              x:Class="WorkshopOilApp.Views.AddOilChangePage"
              Title="New Oil Change"
-             BackgroundColor="#F8FAFC">
+             BackgroundColor="{AppThemeBinding Light=#F8FAFC, Dark={StaticResource Gray950}}">
 
     <ContentPage.BindingContext>
         <vm:AddOilChangeViewModel />
@@ -13,7 +13,7 @@
         <VerticalStackLayout Padding="20" Spacing="20">
 
             <!-- Vehicle Info Card -->
-            <Frame BackgroundColor="White" CornerRadius="16" HasShadow="True" Padding="20">
+            <Frame BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray900}}" CornerRadius="16" HasShadow="True" Padding="20">
                 <VerticalStackLayout Spacing="10">
                     <Label Text="{Binding Vehicle.FullModel}" FontSize="22" FontAttributes="Bold" />
                     <Label Text="{Binding Vehicle.RegistrationNumber}" FontSize="16" TextColor="#64748B" />
@@ -22,7 +22,7 @@
             </Frame>
 
             <!-- Oil Selection -->
-            <Frame BackgroundColor="White" CornerRadius="16" HasShadow="True" Padding="15">
+            <Frame BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray900}}" CornerRadius="16" HasShadow="True" Padding="15">
                 <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="100,*">
                     <Label Text="Oil Type:" Grid.Row="0" Grid.Column="0" FontAttributes="Bold" VerticalOptions="Center" />
                     <Picker Grid.Row="0" Grid.Column="1"
@@ -36,7 +36,7 @@
             </Frame>
 
             <!-- Mileage & Cost -->
-            <Frame BackgroundColor="White" CornerRadius="16" HasShadow="True" Padding="15">
+            <Frame BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray900}}" CornerRadius="16" HasShadow="True" Padding="15">
                 <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" RowSpacing="15">
                     <Label Text="Mileage:" FontAttributes="Bold" VerticalOptions="Center" />
                     <Entry Text="{Binding Mileage}" Keyboard="Numeric" Grid.Column="1" />
@@ -47,9 +47,9 @@
             </Frame>
 
             <!-- Next Due Calculation -->
-            <Frame BackgroundColor="#EFF6FF" CornerRadius="16" Padding="18" HasShadow="True">
+            <Frame BackgroundColor="{AppThemeBinding Light=#EFF6FF, Dark={StaticResource Gray900}}" CornerRadius="16" Padding="18" HasShadow="True">
                 <VerticalStackLayout Spacing="15">
-                    <Label Text="Next Service Recommendation" FontSize="18" FontAttributes="Bold" TextColor="#1E40AF" />
+                    <Label Text="Next Service Recommendation" FontSize="18" FontAttributes="Bold" TextColor="{AppThemeBinding Light=#1E40AF, Dark={StaticResource White}}" />
 
                     <!-- Next Date -->
                     <Grid ColumnDefinitions="120,*">
@@ -58,9 +58,9 @@
                                     Date="{Binding NextRecommendedDate}" 
                                     MinimumDate="{Binding MinimumNextDate}" />
                     </Grid>
-                    <Label Text="Must be at least 7 days after change date" 
-                           FontSize="12" 
-                           TextColor="#DC2626" 
+                    <Label Text="Must be at least 7 days after change date"
+                           FontSize="12"
+                           TextColor="#DC2626"
                            IsVisible="{Binding NextDateErrorVisible}" />
 
                     <!-- Next Km -->
@@ -71,15 +71,15 @@
                                Keyboard="Numeric"
                                Placeholder="e.g. 165000" />
                     </Grid>
-                    <Label Text="Must be at least 500 km more than current mileage" 
-                           FontSize="12" 
-                           TextColor="#DC2626" 
+                    <Label Text="Must be at least 500 km more than current mileage"
+                           FontSize="12"
+                           TextColor="#DC2626"
                            IsVisible="{Binding NextKmErrorVisible}" />
                 </VerticalStackLayout>
             </Frame>
 
             <!-- Notes -->
-            <Frame BackgroundColor="White" CornerRadius="16" HasShadow="True">
+            <Frame BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray900}}" CornerRadius="16" HasShadow="True">
                 <Editor Placeholder="Notes (filter, driving conditions, etc.)"
                         Text="{Binding Notes}"
                         HeightRequest="100" />

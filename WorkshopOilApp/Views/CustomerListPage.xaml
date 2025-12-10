@@ -4,7 +4,7 @@
              xmlns:vm="clr-namespace:WorkshopOilApp.ViewModels"
              x:Class="WorkshopOilApp.Views.CustomerListPage"
              Title="Customers"
-             BackgroundColor="#F8FAFC"
+             BackgroundColor="{AppThemeBinding Light=#F8FAFC, Dark={StaticResource Gray950}}"
              x:DataType="vm:CustomerListViewModel">
 
     <ContentPage.BindingContext>
@@ -37,7 +37,7 @@
                         <Frame Margin="12,6" 
                                CornerRadius="16"
                                HasShadow="True"
-                               BackgroundColor="White"
+                               BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray900}}"
                                Padding="16">
 
                             <Grid ColumnDefinitions="*,Auto">
