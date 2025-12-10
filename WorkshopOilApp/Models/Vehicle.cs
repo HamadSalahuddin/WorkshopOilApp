@@ -28,9 +28,6 @@ namespace WorkshopOilApp.Models
         public string? Engine { get; set; }
         public double OilCapacityLiters { get; set; } = 5.0;
 
-        public int? RecommendedKmInterval { get; set; }     // fallback
-        public int? RecommendedMonths { get; set; }         // fallback
-
         public int? CurrentLubricantId { get; set; }
 
         public string? Notes { get; set; }
@@ -44,9 +41,6 @@ namespace WorkshopOilApp.Models
         // Relationships
         [ManyToOne]
         public Customer? Customer { get; set; }
-
-        [ForeignKey(typeof(Lubricant))]
-        public int? LubricantId { get; set; }
 
         [ManyToOne]
         public Lubricant? CurrentLubricant { get; set; }
