@@ -22,7 +22,7 @@
                    FontSize="26"
                    FontAttributes="Bold"
                    HorizontalOptions="Center"
-                   TextColor="{AppThemeBinding Light=#1E293B, Dark=#5271a3}" />
+                  TextColor="{AppThemeBinding Light={StaticResource HeadingColorLight}, Dark={StaticResource HeadingColorDark}}" />
 
             <!-- Form Fields -->
             <Frame BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray900}}" CornerRadius="16" HasShadow="True" Padding="18">

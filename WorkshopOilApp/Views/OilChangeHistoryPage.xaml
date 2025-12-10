@@ -14,7 +14,7 @@
         <!-- Date Range Filter Card -->
         <Frame Grid.Row="0" BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray900}}" Margin="12,10" CornerRadius="16" HasShadow="True">
             <VerticalStackLayout Padding="18" Spacing="15">
-                <Label Text="Filter by Date Range" FontSize="18" FontAttributes="Bold" TextColor="{AppThemeBinding Light=#1E293B, Dark=#5271a3}" />
+                <Label Text="Filter by Date Range" FontSize="18" FontAttributes="Bold" TextColor="{AppThemeBinding Light={StaticResource HeadingColorLight}, Dark={StaticResource HeadingColorDark}}" />
 
                 <Grid ColumnDefinitions="*,*" ColumnSpacing="15">
                     <VerticalStackLayout>
@@ -70,7 +70,7 @@
                                 <Label Text="{Binding LubricantName}"
                                        FontSize="18"
                                        FontAttributes="Bold"
-                                       TextColor="{AppThemeBinding Light=#1E293B, Dark=#5271a3}" />
+                                      TextColor="{AppThemeBinding Light={StaticResource HeadingColorLight}, Dark={StaticResource HeadingColorDark}}" />
 
                                 <Label Text="{Binding DateDisplay}"
                                        FontSize="15"

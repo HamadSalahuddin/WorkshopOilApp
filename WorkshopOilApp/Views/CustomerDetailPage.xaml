@@ -21,7 +21,7 @@
                 <Label Text="{Binding Customer.FullName}"
                        FontSize="24"
                        FontAttributes="Bold"
-                       TextColor="{AppThemeBinding Light=#1E293B, Dark=#5271a3}" />
+                       TextColor="{AppThemeBinding Light={StaticResource HeadingColorLight}, Dark={StaticResource HeadingColorDark}}" />
 
                 <HorizontalStackLayout Spacing="5">
                     <Label Text="Phone:" FontAttributes="Bold" />
@@ -77,7 +77,7 @@
                                     <Label Text="{Binding FullModel}"
                                            FontSize="18"
                                            FontAttributes="Bold"
-                                           TextColor="{AppThemeBinding Light=#1E293B, Dark=#5271a3}" />
+                                          TextColor="{AppThemeBinding Light={StaticResource HeadingColorLight}, Dark={StaticResource HeadingColorDark}}" />
 
                                     <Label Text="{Binding RegistrationNumber}"
                                            FontSize="14"
