@@ -43,6 +43,7 @@ namespace WorkshopOilApp.Models
         public Customer? Customer { get; set; }
 
         [ManyToOne]
+        [ForeignKey(typeof(Lubricant))]
         public Lubricant? CurrentLubricant { get; set; }
 
         [OneToMany(CascadeOperations = CascadeOperation.All)]
