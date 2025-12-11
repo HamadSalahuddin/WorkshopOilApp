@@ -6,25 +6,45 @@ namespace WorkshopOilApp.Services;
 
 public class DatabaseService
 {
-    private static readonly Lazy<Task<DatabaseService>> _instance
-        = new(async () => await CreateInstanceAsync());
+    private static DatabaseService? _instance;
+    private static readonly System.Threading.SemaphoreSlim _initLock = new(1, 1);
 
-    public static Task<DatabaseService> InstanceAsync => _instance.Value;
+    public static DatabaseService Instance =>
+        _instance ?? throw new InvalidOperationException("DatabaseService is not initialized. Call InitializeAsync() first.");
 
-    private SQLiteAsyncConnection? _db;
+    public static Task<DatabaseService> InstanceAsync => GetOrCreateInstanceAsync();
 
-    public SQLiteAsyncConnection Db => _db!;
+    public static Task InitializeAsync() => GetOrCreateInstanceAsync();
 
-    private DatabaseService() { }  // private constructor
+    public SQLiteAsyncConnection Db { get; }
 
-    private static async Task<DatabaseService> CreateInstanceAsync()
+    private DatabaseService(SQLiteAsyncConnection db)
     {
-        var service = new DatabaseService();
-        await service.InitAsync();
-        return service;
+        Db = db;
     }
 
-    private async Task InitAsync()
+    private static async Task<DatabaseService> GetOrCreateInstanceAsync()
+    {
+        if (_instance != null)
+            return _instance;
+
+        await _initLock.WaitAsync().ConfigureAwait(false);
+        try
+        {
+            if (_instance != null)
+                return _instance;
+
+            var conn = await CreateAndInitializeConnectionAsync().ConfigureAwait(false);
+            _instance = new DatabaseService(conn);
+            return _instance;
+        }
+        finally
+        {
+            _initLock.Release();
+        }
+    }
+
+    private static async Task<SQLiteAsyncConnection> CreateAndInitializeConnectionAsync()
     {
         var databasePath = Path.Combine(FileSystem.AppDataDirectory, "WorkshopDb.db3");
 
@@ -55,18 +75,6 @@ public class DatabaseService
 
         await conn.ExecuteAsync("CREATE INDEX IF NOT EXISTS IX_Customers_Name ON Customers(GivenName, LastName);");
 
-        _db = conn;
+        return conn;
     }
-
-    //public async Task<T?> GetWithChildrenAsync<T>(int id, bool recursive = false) where T : class
-    //{
-    //    return await Db.GetWithChildrenAsync<T>(id, recursive);
-    //}
-
-    //public async Task<List<Customer>> GetCustomersWithDataAsync()
-    //{
-    //    var customers = await Db.Table<Customer>().ToListAsync();
-    //    await Db.GetChildrenAsync(customers, recursive: true);
-    //    return customers;
-    //}
 }
