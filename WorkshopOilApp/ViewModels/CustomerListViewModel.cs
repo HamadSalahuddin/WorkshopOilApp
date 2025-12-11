@@ -1,10 +1,12 @@
-﻿// ViewModels/CustomerListViewModel.cs
+// ViewModels/CustomerListViewModel.cs
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using SQLiteNetExtensionsAsync.Extensions;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
+using System.Threading.Tasks;
 using WorkshopOilApp.Models;
-using WorkshopOilApp.Services;
+using WorkshopOilApp.Services.Repositories;
 using WorkshopOilApp.Views;
 
 namespace WorkshopOilApp.ViewModels;
@@ -20,7 +22,9 @@ public partial class CustomerListViewModel : ObservableObject
 
     private int _currentPage = 0;
     private bool _isLoadingMore = false;
-    private bool _hasMoreData = true;   // ← NEW: prevents extra loads
+    private bool _hasMoreData = true;
+
+    private readonly CustomerRepository _customersRepo = new();
 
     public async void OnAppearing()
     {
@@ -38,8 +42,8 @@ public partial class CustomerListViewModel : ObservableObject
         IsBusy = true;
         Customers.Clear();
         _currentPage = 0;
-        _hasMoreData = true;           // ← reset
-        await LoadPage(append: false);  // ← false = replace
+        _hasMoreData = true;
+        await LoadPage(append: false);
         IsBusy = false;
     }
 
@@ -52,7 +56,6 @@ public partial class CustomerListViewModel : ObservableObject
         _currentPage++;
         var addedCount = await LoadPage(append: true);
 
-        // If we got fewer than PageSize → no more data
         if (addedCount < PageSize)
             _hasMoreData = false;
 
@@ -69,36 +72,24 @@ public partial class CustomerListViewModel : ObservableObject
 
     private async Task<int> LoadPage(bool append)
     {
-        var dbService = await DatabaseService.InstanceAsync;
-        var db = dbService.Db;
+        var pageResult = await _customersRepo.GetPageAsync(
+            SearchText,
+            _currentPage * PageSize,
+            PageSize + 1);
 
-        var query = db.Table<Customer>()
-            .OrderBy(c => c.LastName)
-            .ThenBy(c => c.GivenName);
-
-        if (!string.IsNullOrWhiteSpace(SearchText))
-        {
-            var lower = SearchText.Trim().ToLower();
-            query = query.Where(c =>
-                c.GivenName.ToLower().Contains(lower) ||
-                c.LastName.ToLower().Contains(lower));
-        }
-
-        var page = await query
-            .Skip(_currentPage * PageSize)
-            .Take(PageSize + 1)   // +1 to check if there's more
-            .ToListAsync();
-
-        if (page.Count == 0)
+        if (!pageResult.IsSuccess || pageResult.Data == null || pageResult.Data.Count == 0)
             return 0;
 
-        var idsToLoad = page.Take(PageSize).Select(c => c.CustomerId).ToList();
+        var idsToLoad = pageResult.Data.Take(PageSize).Select(c => c.CustomerId).ToList();
         var fullCustomers = new List<Customer>();
 
         foreach (var id in idsToLoad)
         {
-            var cust = await db.GetWithChildrenAsync<Customer>(id, recursive: true);
-            if (cust != null) fullCustomers.Add(cust);
+            var custResult = await _customersRepo.GetWithVehiclesAsync(id);
+            if (custResult.IsSuccess && custResult.Data != null)
+            {
+                fullCustomers.Add(custResult.Data);
+            }
         }
 
         var cards = new List<CustomerCardViewModel>();
@@ -120,7 +111,7 @@ public partial class CustomerListViewModel : ObservableObject
         foreach (var card in cards)
             Customers.Add(card);
 
-        return cards.Count;  // return how many we actually added
+        return cards.Count;
     }
 
     [RelayCommand]
@@ -134,3 +125,4 @@ public partial class CustomerListViewModel : ObservableObject
     async Task SelectCustomer(CustomerCardViewModel card)
         => await Shell.Current.GoToAsync($"{nameof(CustomerDetailPage)}?customerId={card.Customer.CustomerId}");
 }
+

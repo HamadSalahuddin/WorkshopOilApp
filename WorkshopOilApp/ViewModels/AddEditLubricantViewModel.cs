@@ -1,11 +1,13 @@
-﻿// ViewModels/AddEditLubricantViewModel.cs
+// ViewModels/AddEditLubricantViewModel.cs
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using WorkshopOilApp.Models;
-using WorkshopOilApp.Services;
+using WorkshopOilApp.Services.Repositories;
 
 namespace WorkshopOilApp.ViewModels;
-
 
 public partial class AddEditLubricantViewModel : ObservableObject, IQueryAttributable
 {
@@ -26,6 +28,8 @@ public partial class AddEditLubricantViewModel : ObservableObject, IQueryAttribu
 
     private int? LubricantId { get; set; }
 
+    private readonly LubricantRepository _lubricants = new();
+
     public void ApplyQueryAttributes(IDictionary<string, object> query)
     {
         if (query.TryGetValue("id", out var id))
@@ -39,9 +43,20 @@ public partial class AddEditLubricantViewModel : ObservableObject, IQueryAttribu
 
     private async Task LoadLubricant()
     {
+        if (!LubricantId.HasValue)
+            return;
+
         IsBusy = true;
-        var db = await DatabaseService.InstanceAsync;
-        var l = await db.Db.GetAsync<Lubricant>(LubricantId!.Value);
+        var result = await _lubricants.GetByIdAsync(LubricantId.Value);
+        if (!result.IsSuccess || result.Data == null)
+        {
+            ErrorMessage = result.ErrorMessage;
+            HasError = true;
+            IsBusy = false;
+            return;
+        }
+
+        var l = result.Data;
 
         Name = l.Name;
         Viscosity = l.Viscosity;
@@ -62,12 +77,22 @@ public partial class AddEditLubricantViewModel : ObservableObject, IQueryAttribu
         }
 
         IsBusy = true;
-        var db = await DatabaseService.InstanceAsync;
+        HasError = false;
+        ErrorMessage = "";
 
         Lubricant l;
         if (LubricantId.HasValue)
         {
-            l = await db.Db.GetAsync<Lubricant>(LubricantId.Value);
+            var existing = await _lubricants.GetByIdAsync(LubricantId.Value);
+            if (!existing.IsSuccess || existing.Data == null)
+            {
+                ErrorMessage = existing.ErrorMessage;
+                HasError = true;
+                IsBusy = false;
+                return;
+            }
+
+            l = existing.Data;
         }
         else
         {
@@ -81,11 +106,30 @@ public partial class AddEditLubricantViewModel : ObservableObject, IQueryAttribu
         l.Notes = string.IsNullOrWhiteSpace(Notes) ? null : Notes.Trim();
 
         if (LubricantId.HasValue)
-            await db.Db.UpdateAsync(l);
+        {
+            var updateResult = await _lubricants.UpdateAsync(l);
+            if (!updateResult.IsSuccess)
+            {
+                ErrorMessage = updateResult.ErrorMessage;
+                HasError = true;
+                IsBusy = false;
+                return;
+            }
+        }
         else
-            await db.Db.InsertAsync(l);
+        {
+            var insertResult = await _lubricants.InsertAsync(l);
+            if (!insertResult.IsSuccess)
+            {
+                ErrorMessage = insertResult.ErrorMessage;
+                HasError = true;
+                IsBusy = false;
+                return;
+            }
+        }
 
         IsBusy = false;
         await Shell.Current.GoToAsync("..");
     }
 }
+

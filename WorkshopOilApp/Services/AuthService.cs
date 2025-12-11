@@ -1,10 +1,13 @@
-﻿using WorkshopOilApp.Helpers;
+using WorkshopOilApp.Helpers;
 using WorkshopOilApp.Models;
+using WorkshopOilApp.Services.Repositories;
 
 namespace WorkshopOilApp.Services;
 
 public class AuthService
 {
+    private readonly UserRepository _users = new();
+
     public async Task<Result<User>> LoginAsync(string username, string password)
     {
         if (string.IsNullOrWhiteSpace(username))
@@ -17,21 +20,18 @@ public class AuthService
             return Result<User>.Failure("Password is required");
         }
 
-        var dbService = await DatabaseService.InstanceAsync;
-        var user = await dbService.Db.Table<User>()
-            .FirstOrDefaultAsync(u => u.UserName.ToLower() == username.ToLower());
-
-        if (user == null)
+        var userResult = await _users.GetByUserNameAsync(username);
+        if (!userResult.IsSuccess || userResult.Data == null)
         {
             return Result<User>.Failure("Invalid username or password");
         }
 
-        if (!PasswordHasher.VerifyPassword(password, user.HashedPassword))
+        if (!PasswordHasher.VerifyPassword(password, userResult.Data.HashedPassword))
         {
             return Result<User>.Failure("Invalid username or password");
         }
 
-        return Result<User>.Success(user);
+        return Result<User>.Success(userResult.Data);
     }
 
     public async Task<Result<User>> RegisterAsync(User user, string plainPassword)
@@ -66,12 +66,13 @@ public class AuthService
             return Result<User>.Failure("Business Contact is required");
         }
 
-        var dbService = await DatabaseService.InstanceAsync;
-        var existing = await dbService.Db
-            .Table<User>()
-            .FirstOrDefaultAsync(u => u.UserName.ToLower() == user.UserName.ToLower());
+        var existsResult = await _users.UserNameExistsAsync(user.UserName);
+        if (!existsResult.IsSuccess)
+        {
+            return Result<User>.Failure(existsResult.ErrorMessage);
+        }
 
-        if (existing != null)
+        if (existsResult.Data)
         {
             return Result<User>.Failure("Username already exists");
         }
@@ -80,25 +81,33 @@ public class AuthService
         user.CreatedAt = DateTime.UtcNow.ToString("o");
         user.UpdatedAt = user.CreatedAt;
 
-        await dbService.Db.InsertAsync(user);
-        return Result<User>.Success(user);
+        var insertResult = await _users.InsertAsync(user);
+        if (!insertResult.IsSuccess)
+        {
+            return Result<User>.Failure(insertResult.ErrorMessage);
+        }
+
+        return insertResult;
     }
 
     public async Task<Result> ResetPasswordAsync(string username, string passcode, string newPassword)
     {
-        var dbService = await DatabaseService.InstanceAsync;
-        var user = await dbService.Db.Table<User>()
-            .FirstOrDefaultAsync(u => u.UserName.ToLower() == username.ToLower() && u.PassCode == passcode);
-
-        if (user == null)
+        var userResult = await _users.GetByUserNameAndPasscodeAsync(username, passcode);
+        if (!userResult.IsSuccess || userResult.Data == null)
         {
             return Result.Failure("Invalid username or passcode");
         }
 
-        user.HashedPassword = PasswordHasher.HashPassword(newPassword);
-        user.UpdatedAt = DateTime.UtcNow.ToString("o");
+        userResult.Data.HashedPassword = PasswordHasher.HashPassword(newPassword);
+        userResult.Data.UpdatedAt = DateTime.UtcNow.ToString("o");
 
-        await dbService.Db.UpdateAsync(user);
+        var updateResult = await _users.UpdateAsync(userResult.Data);
+        if (!updateResult.IsSuccess)
+        {
+            return Result.Failure(updateResult.ErrorMessage);
+        }
+
         return Result.Success();
     }
 }
+

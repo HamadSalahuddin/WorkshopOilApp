@@ -1,9 +1,12 @@
-﻿// ViewModels/AddOilChangeViewModel.cs
+// ViewModels/AddOilChangeViewModel.cs
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using SQLiteNetExtensionsAsync.Extensions;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using WorkshopOilApp.Models;
-using WorkshopOilApp.Services;
+using WorkshopOilApp.Services.Repositories;
 
 namespace WorkshopOilApp.ViewModels;
 
@@ -39,6 +42,11 @@ public partial class AddOilChangeViewModel : ObservableObject, IQueryAttributabl
     [ObservableProperty]
     private string _nextDueDateString = "";
 
+    private readonly CustomerRepository _customers = new();
+    private readonly LubricantRepository _lubricants = new();
+    private readonly VehicleRepository _vehicles = new();
+    private readonly OilChangeRecordRepository _oilChanges = new();
+
     partial void OnSelectedLubricantChanged(Lubricant? oldValue, Lubricant? newValue)
         => UpdateDuePreview();
 
@@ -65,16 +73,29 @@ public partial class AddOilChangeViewModel : ObservableObject, IQueryAttributabl
     private async Task LoadDataAsync()
     {
         IsBusy = true;
-        var db = await DatabaseService.InstanceAsync;
 
-        Customer = await db.Db.GetWithChildrenAsync<Customer>(CustomerId);
+        var customerResult = await _customers.GetWithVehiclesAsync(CustomerId);
+        if (!customerResult.IsSuccess || customerResult.Data == null)
+        {
+            SaveErrorMessage = customerResult.ErrorMessage;
+            HasSaveError = true;
+            IsBusy = false;
+            return;
+        }
+
+        Customer = customerResult.Data;
         Vehicle = Customer.Vehicles!.First(v => v.VehicleId == VehicleId);
 
-        AvailableLubricants = await db.Db.Table<Lubricant>().ToListAsync();
+        var lubesResult = await _lubricants.GetAllAsync();
+        if (lubesResult.IsSuccess && lubesResult.Data != null)
+        {
+            AvailableLubricants = lubesResult.Data;
+        }
+
         SelectedLubricant = AvailableLubricants.FirstOrDefault(l => l.LubricantId == Vehicle.CurrentLubricantId)
                            ?? AvailableLubricants.FirstOrDefault();
         NextRecommendedDate = ChangeDate.AddMonths(3);
-        
+
         IsBusy = false;
         UpdateDuePreview();
     }
@@ -86,7 +107,7 @@ public partial class AddOilChangeViewModel : ObservableObject, IQueryAttributabl
         HasSaveError = false;
         NextDateErrorVisible = false;
         NextKmErrorVisible = false;
-        // Required fields
+
         if (SelectedLubricant == null)
         {
             SaveErrorMessage = "Please select an oil type";
@@ -101,7 +122,6 @@ public partial class AddOilChangeViewModel : ObservableObject, IQueryAttributabl
             return;
         }
 
-        // Business rule: Next date ≥ ChangeDate + 7 days
         if (NextRecommendedDate < ChangeDate.AddDays(7))
         {
             NextDateErrorVisible = true;
@@ -109,7 +129,6 @@ public partial class AddOilChangeViewModel : ObservableObject, IQueryAttributabl
             HasSaveError = true;
         }
 
-        // Business rule: Next Km ≥ current + 500
         if (!double.TryParse(NextRecommendedKm, out var nextKm) || nextKm < Mileage + 500)
         {
             NextKmErrorVisible = true;
@@ -134,27 +153,45 @@ public partial class AddOilChangeViewModel : ObservableObject, IQueryAttributabl
             CreatedAt = DateTime.UtcNow.ToString("o")
         };
 
-        var db = await DatabaseService.InstanceAsync;
-        var oilChangeRecordForVechileForSelectedDate = await db.Db.Table<OilChangeRecord>()
-            .Where(oilChangeRecord => oilChangeRecord.ChangeDate == record.ChangeDate)
-            .Where(oilChangeRecord => oilChangeRecord.VehicleId == record.VehicleId)
-            .FirstOrDefaultAsync();
-
-        if (oilChangeRecordForVechileForSelectedDate != null)
+        var existingResult = await _oilChanges.GetForVehicleOnDateAsync(record.VehicleId, record.ChangeDate);
+        if (!existingResult.IsSuccess)
         {
-            SaveErrorMessage = $"Record for {Vehicle.FullModel} on {ChangeDate.Date.ToString("d")} already exists.";
+            SaveErrorMessage = existingResult.ErrorMessage;
             HasSaveError = true;
             IsBusy = false;
             return;
         }
-        await db.Db.InsertAsync(record);
 
-        // Update vehicle's current lubricant
+        if (existingResult.Data != null)
+        {
+            SaveErrorMessage = $"Record for {Vehicle.FullModel} on {ChangeDate.Date:d} already exists.";
+            HasSaveError = true;
+            IsBusy = false;
+            return;
+        }
+
+        var insertRecordResult = await _oilChanges.InsertAsync(record);
+        if (!insertRecordResult.IsSuccess)
+        {
+            SaveErrorMessage = insertRecordResult.ErrorMessage;
+            HasSaveError = true;
+            IsBusy = false;
+            return;
+        }
+
         Vehicle.CurrentLubricantId = SelectedLubricant.LubricantId;
-        await db.Db.UpdateAsync(Vehicle);
+        var updateVehicleResult = await _vehicles.UpdateAsync(Vehicle);
+        if (!updateVehicleResult.IsSuccess)
+        {
+            SaveErrorMessage = updateVehicleResult.ErrorMessage;
+            HasSaveError = true;
+            IsBusy = false;
+            return;
+        }
 
         IsBusy = false;
 
-        await Shell.Current.GoToAsync("..");  // back to customer detail
+        await Shell.Current.GoToAsync("..");
     }
 }
+
