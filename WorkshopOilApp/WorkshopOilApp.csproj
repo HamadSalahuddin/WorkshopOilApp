@@ -60,12 +60,17 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
-		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.0" />
+	  <AndroidResource Remove="Services\Repository\**" />
+	  <Compile Remove="Services\Repository\**" />
+	  <EmbeddedResource Remove="Services\Repository\**" />
+	  <MauiCss Remove="Services\Repository\**" />
+	  <MauiXaml Remove="Services\Repository\**" />
+	  <None Remove="Services\Repository\**" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="Services\Repository\" />
+		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.0" />
 	</ItemGroup>
 
 	<ItemGroup>
