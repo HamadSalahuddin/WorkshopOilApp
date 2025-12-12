@@ -1,10 +1,12 @@
-﻿// ViewModels/OilChangeHistoryViewModel.cs
+// ViewModels/OilChangeHistoryViewModel.cs
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using SQLiteNetExtensionsAsync.Extensions;
+using System;
 using System.Collections.ObjectModel;
+using System.Linq;
+using System.Threading.Tasks;
 using WorkshopOilApp.Models;
-using WorkshopOilApp.Services;
+using WorkshopOilApp.Services.Repositories;
 
 namespace WorkshopOilApp.ViewModels;
 
@@ -29,6 +31,9 @@ public partial class OilChangeHistoryViewModel : ObservableObject, IQueryAttribu
     private bool _isLoadingMore = false;
     private bool _hasMore = true;
 
+    private readonly OilChangeRecordRepository _oilChanges = new();
+    private readonly LubricantRepository _lubricants = new();
+
     public void ApplyQueryAttributes(IDictionary<string, object> query)
     {
         if (query.TryGetValue("vehicleId", out var id))
@@ -37,6 +42,7 @@ public partial class OilChangeHistoryViewModel : ObservableObject, IQueryAttribu
             _ = LoadHistoryAsync();
         }
     }
+
     public async void OnAppearing()
     {
         if (History.Count == 0 && !IsBusy)
@@ -79,46 +85,37 @@ public partial class OilChangeHistoryViewModel : ObservableObject, IQueryAttribu
 
     private async Task LoadPageAsync()
     {
-        var db = await DatabaseService.InstanceAsync;
-
         var startIso = ToIsoString(StartDate);
         var endIso = ToIsoString(EndDate.AddDays(1));
-        var recordIds = await db.Db.QueryScalarsAsync<int>(
-            "SELECT OilChangeId FROM OilChangeRecords WHERE VehicleId = ? AND ChangeDate >= ? AND ChangeDate <= ?",
-            VehicleId, startIso, endIso
-        );
 
-        var query = db.Db.Table<OilChangeRecord>()
-        .Where(r => recordIds.Contains(r.OilChangeId));
+        var pageResult = await _oilChanges.GetHistoryPageAsync(
+            VehicleId,
+            startIso,
+            endIso,
+            _currentPage * PageSize,
+            PageSize + 1);
 
-        List<OilChangeRecord> page;
-        try
-        {
-            page = await query
-            .OrderByDescending(r => r.ChangeDate)
-            .Skip(_currentPage * PageSize)
-            .Take(PageSize + 1)
-            .ToListAsync();
-        }
-        catch(Exception e)
-        {
-            System.Diagnostics.Debug.WriteLine($"Exception :{e.Message}");
-            throw;
-        }
-
-        if (page?.Count == 0)
+        if (!pageResult.IsSuccess || pageResult.Data == null || pageResult.Data.Count == 0)
         {
             _hasMore = false;
             return;
         }
 
-        await db.Db.GetChildrenAsync(page);
+        var page = pageResult.Data;
 
         var oilChangeRecords = page.Take(PageSize).ToList();
 
         foreach (var oilChangeRecord in oilChangeRecords)
         {
-            oilChangeRecord.Lubricant = await db.Db.GetAsync<Lubricant>(lubricant => lubricant.LubricantId == oilChangeRecord.LubricantId);
+            if (oilChangeRecord.Lubricant == null)
+            {
+                var lubeResult = await _lubricants.GetByIdAsync(oilChangeRecord.LubricantId);
+                if (lubeResult.IsSuccess)
+                {
+                    oilChangeRecord.Lubricant = lubeResult.Data;
+                }
+            }
+
             History.Add(new OilChangeCardViewModel(oilChangeRecord));
         }
 
@@ -135,3 +132,4 @@ public partial class OilChangeHistoryViewModel : ObservableObject, IQueryAttribu
         IsBusy = false;
     }
 }
+

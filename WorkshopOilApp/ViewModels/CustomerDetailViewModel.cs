@@ -1,10 +1,12 @@
-﻿// ViewModels/CustomerDetailViewModel.cs
+// ViewModels/CustomerDetailViewModel.cs
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using SQLiteNetExtensionsAsync.Extensions;
+using System;
 using System.Collections.ObjectModel;
+using System.Linq;
+using System.Threading.Tasks;
 using WorkshopOilApp.Models;
-using WorkshopOilApp.Services;
+using WorkshopOilApp.Services.Repositories;
 using WorkshopOilApp.Views;
 
 namespace WorkshopOilApp.ViewModels;
@@ -18,6 +20,9 @@ public partial class CustomerDetailViewModel : ObservableObject, IQueryAttributa
     [ObservableProperty] bool isBusy;
 
     private int CustomerId { get; set; }
+
+    private readonly CustomerRepository _customers = new();
+    private readonly LubricantRepository _lubricants = new();
 
     public void ApplyQueryAttributes(IDictionary<string, object> query)
     {
@@ -49,24 +54,29 @@ public partial class CustomerDetailViewModel : ObservableObject, IQueryAttributa
     [RelayCommand]
     async Task LoadCustomerAsync()
     {
-        var db = await DatabaseService.InstanceAsync;
+        var result = await _customers.GetWithVehiclesAsync(CustomerId);
+        if (!result.IsSuccess || result.Data == null)
+        {
+            // keep it simple: just stop if load failed
+            return;
+        }
 
-        Customer = await db.Db.GetWithChildrenAsync<Customer>(CustomerId, recursive: true);
+        Customer = result.Data;
 
-        if (Customer == null) return;
-
-        
         foreach (var vehicle in Customer.Vehicles ?? new())
         {
             var latest = vehicle.OilChangeRecords?
                 .OrderByDescending(r => r.ChangeDate)
                 .FirstOrDefault();
 
-            var currentLubricant = vehicle.CurrentLubricantId != null 
-                ? await db.Db.GetAsync<Lubricant>(l => l.LubricantId == vehicle.CurrentLubricantId)
-                : null;
-
-            vehicle.CurrentLubricant = currentLubricant;
+            if (vehicle.CurrentLubricantId != null)
+            {
+                var lubeResult = await _lubricants.GetByIdAsync(vehicle.CurrentLubricantId.Value);
+                if (lubeResult.IsSuccess)
+                {
+                    vehicle.CurrentLubricant = lubeResult.Data;
+                }
+            }
 
             Vehicles.Add(new VehicleCardViewModel(vehicle, latest));
         }
@@ -93,7 +103,7 @@ public partial class CustomerDetailViewModel : ObservableObject, IQueryAttributa
 
     [RelayCommand]
     async Task AddVehicle()
-    => await Shell.Current.GoToAsync($"{nameof(AddEditVehiclePage)}?customerId={Customer.CustomerId}");
+        => await Shell.Current.GoToAsync($"{nameof(AddEditVehiclePage)}?customerId={Customer.CustomerId}");
 
     [RelayCommand]
     async Task EditVehicle(VehicleCardViewModel card)
@@ -110,3 +120,4 @@ public partial class CustomerDetailViewModel : ObservableObject, IQueryAttributa
         await Shell.Current.GoToAsync(route);
     }
 }
+

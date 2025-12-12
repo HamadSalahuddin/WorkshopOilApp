@@ -1,10 +1,9 @@
 ﻿// ViewModels/AddEditCustomerViewModel.cs
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using SQLiteNetExtensionsAsync.Extensions;
-using System.Net.Mail;
 using WorkshopOilApp.Models;
 using WorkshopOilApp.Services;
+using WorkshopOilApp.Services.Repositories;
 
 namespace WorkshopOilApp.ViewModels;
 
@@ -27,6 +26,8 @@ public partial class AddEditCustomerViewModel : ObservableObject, IQueryAttribut
 
     private int? CustomerId { get; set; }
 
+    private readonly CustomerRepository _customers = new();
+
     public void ApplyQueryAttributes(IDictionary<string, object> query)
     {
         if (query.TryGetValue("customerId", out var idObj))
@@ -41,8 +42,16 @@ public partial class AddEditCustomerViewModel : ObservableObject, IQueryAttribut
     private async Task LoadCustomerAsync()
     {
         IsBusy = true;
-        var db = await DatabaseService.InstanceAsync;
-        var customer = await db.Db.GetWithChildrenAsync<Customer>(CustomerId!.Value);
+        var result = await _customers.GetWithVehiclesAsync(CustomerId!.Value);
+        if (!result.IsSuccess || result.Data == null)
+        {
+            ErrorMessage = result.ErrorMessage;
+            HasError = true;
+            IsBusy = false;
+            return;
+        }
+
+        var customer = result.Data;
 
         GivenName = customer.GivenName;
         LastName = customer.LastName;
@@ -71,9 +80,24 @@ public partial class AddEditCustomerViewModel : ObservableObject, IQueryAttribut
 
         IsBusy = true;
 
-        var customer = CustomerId.HasValue
-            ? await (await DatabaseService.InstanceAsync).Db.GetWithChildrenAsync<Customer>(CustomerId.Value)
-            : new Customer();
+        Customer customer;
+        if (CustomerId.HasValue)
+        {
+            var existingResult = await _customers.GetWithVehiclesAsync(CustomerId.Value);
+            if (!existingResult.IsSuccess || existingResult.Data == null)
+            {
+                ErrorMessage = existingResult.ErrorMessage;
+                HasError = true;
+                IsBusy = false;
+                return;
+            }
+
+            customer = existingResult.Data;
+        }
+        else
+        {
+            customer = new Customer();
+        }
 
         customer.GivenName = GivenName.Trim();
         customer.LastName = LastName.Trim();
@@ -86,12 +110,28 @@ public partial class AddEditCustomerViewModel : ObservableObject, IQueryAttribut
         if (!CustomerId.HasValue)
             customer.CreatedAt = DateTime.UtcNow.ToString("o");
 
-        var db = await DatabaseService.InstanceAsync;
-
         if (CustomerId.HasValue)
-            await db.Db.UpdateAsync(customer);
+        {
+            var updateResult = await _customers.UpdateAsync(customer);
+            if (!updateResult.IsSuccess)
+            {
+                ErrorMessage = updateResult.ErrorMessage;
+                HasError = true;
+                IsBusy = false;
+                return;
+            }
+        }
         else
-            await db.Db.InsertAsync(customer);
+        {
+            var insertResult = await _customers.InsertAsync(customer);
+            if (!insertResult.IsSuccess)
+            {
+                ErrorMessage = insertResult.ErrorMessage;
+                HasError = true;
+                IsBusy = false;
+                return;
+            }
+        }
 
         IsBusy = false;
         ShowSuccess = true;

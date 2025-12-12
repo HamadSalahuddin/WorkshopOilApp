@@ -1,9 +1,11 @@
-﻿// ViewModels/LubricantListViewModel.cs
+// ViewModels/LubricantListViewModel.cs
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
+using System.Linq;
+using System.Threading.Tasks;
 using WorkshopOilApp.Models;
-using WorkshopOilApp.Services;
+using WorkshopOilApp.Services.Repositories;
 using WorkshopOilApp.Views;
 
 namespace WorkshopOilApp.ViewModels;
@@ -20,6 +22,9 @@ public partial class LubricantListViewModel : ObservableObject
     private int _currentPage = 0;
     private bool _isLoadingMore = false;
     private bool _hasMore = true;
+
+    private readonly LubricantRepository _lubricantsRepo = new();
+    private readonly OilChangeRecordRepository _oilChangesRepo = new();
 
     public async void OnAppearing()
     {
@@ -65,22 +70,18 @@ public partial class LubricantListViewModel : ObservableObject
 
     private async Task LoadPage()
     {
-        var db = await DatabaseService.InstanceAsync;
+        var itemsResult = await _lubricantsRepo.GetPageAsync(
+            SearchText,
+            _currentPage * PageSize,
+            PageSize + 1);
 
-        var query = db.Db.Table<Lubricant>().OrderBy(l => l.Name);
-
-        if (!string.IsNullOrWhiteSpace(SearchText))
+        if (!itemsResult.IsSuccess || itemsResult.Data == null)
         {
-            var lower = SearchText.ToLower();
-            query = query.Where(l =>
-                l.Name.ToLower().Contains(lower) ||
-                l.Viscosity.ToLower().Contains(lower));
+            _hasMore = false;
+            return;
         }
 
-        var items = await query
-            .Skip(_currentPage * PageSize)
-            .Take(PageSize + 1)
-            .ToListAsync();
+        var items = itemsResult.Data;
 
         foreach (var l in items.Take(PageSize))
             Lubricants.Add(new LubricantCardViewModel(l));
@@ -109,22 +110,28 @@ public partial class LubricantListViewModel : ObservableObject
         {
             return;
         }
-        var db = await DatabaseService.InstanceAsync;
 
-        var lubricantOildChanges = await db.Db.Table<OilChangeRecord>()
-            .Where(oilChangeRecord => oilChangeRecord.LubricantId == card.Lubricant.LubricantId)
-            .ToListAsync();
-
-        if (lubricantOildChanges.Any())
+        var usedResult = await _oilChangesRepo.HasRecordsForLubricantAsync(card.Lubricant.LubricantId);
+        if (!usedResult.IsSuccess)
         {
-            await Shell.Current.DisplayAlert("Item Used", "Item you are trying to delete has been used for oil change"," OK");
+            await Shell.Current.DisplayAlert("Error", usedResult.ErrorMessage, "OK");
             return;
         }
 
-        await db.Db.Table<Lubricant>()
-            .DeleteAsync(l => l.LubricantId == card.Lubricant.LubricantId);
+        if (usedResult.Data)
+        {
+            await Shell.Current.DisplayAlert("Item Used", "Item you are trying to delete has been used for oil change", "OK");
+            return;
+        }
 
+        var deleteResult = await _lubricantsRepo.DeleteAsync(card.Lubricant.LubricantId);
+        if (!deleteResult.IsSuccess)
+        {
+            await Shell.Current.DisplayAlert("Error", deleteResult.ErrorMessage, "OK");
+            return;
+        }
 
         await LoadLubricants();
     }
 }
+

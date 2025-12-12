@@ -1,13 +1,11 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using SQLiteNetExtensionsAsync.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using WorkshopOilApp.Models;
-using WorkshopOilApp.Services;
+using WorkshopOilApp.Services.Repositories;
 
 namespace WorkshopOilApp.ViewModels
 {
@@ -35,13 +33,16 @@ namespace WorkshopOilApp.ViewModels
         private int CustomerId { get; set; }
         private int? VehicleId { get; set; }
 
+        private readonly VehicleRepository _vehicles = new();
+        private readonly LubricantRepository _lubricants = new();
+
         public void ApplyQueryAttributes(IDictionary<string, object> query)
         {
             CustomerId = Convert.ToInt32(query["customerId"]);
             Task.Run(async () =>
             {
                 await LoadLubricantsAsync();
-            
+
                 if (query.TryGetValue("vehicleId", out var vid))
                 {
                     VehicleId = Convert.ToInt32(vid);
@@ -54,15 +55,26 @@ namespace WorkshopOilApp.ViewModels
 
         private async Task LoadLubricantsAsync()
         {
-            var db = await DatabaseService.InstanceAsync;
-            AvailableLubricants = await db.Db.Table<Lubricant>().ToListAsync();
+            var result = await _lubricants.GetAllAsync();
+            if (result.IsSuccess && result.Data != null)
+            {
+                AvailableLubricants = result.Data;
+            }
         }
 
         private async Task LoadVehicleAsync()
         {
             IsBusy = true;
-            var db = await DatabaseService.InstanceAsync;
-            var vehicle = await db.Db.GetWithChildrenAsync<Vehicle>(VehicleId!.Value);
+            var result = await _vehicles.GetWithChildrenAsync(VehicleId!.Value);
+            if (!result.IsSuccess || result.Data == null)
+            {
+                ErrorMessage = result.ErrorMessage;
+                HasError = true;
+                IsBusy = false;
+                return;
+            }
+
+            var vehicle = result.Data;
 
             RegistrationNumber = vehicle.RegistrationNumber;
             Make = vehicle.Make;
@@ -87,12 +99,20 @@ namespace WorkshopOilApp.ViewModels
             }
 
             IsBusy = true;
-            var db = await DatabaseService.InstanceAsync;
 
             Vehicle vehicle;
             if (VehicleId.HasValue)
             {
-                vehicle = await db.Db.GetWithChildrenAsync<Vehicle>(VehicleId.Value);
+                var existingResult = await _vehicles.GetWithChildrenAsync(VehicleId.Value);
+                if (!existingResult.IsSuccess || existingResult.Data == null)
+                {
+                    ErrorMessage = existingResult.ErrorMessage;
+                    HasError = true;
+                    IsBusy = false;
+                    return;
+                }
+
+                vehicle = existingResult.Data;
             }
             else
             {
@@ -109,12 +129,31 @@ namespace WorkshopOilApp.ViewModels
             vehicle.CurrentLubricantId = SelectedLubricant?.LubricantId;
 
             if (VehicleId.HasValue)
-                await db.Db.UpdateAsync(vehicle);
+            {
+                var updateResult = await _vehicles.UpdateAsync(vehicle);
+                if (!updateResult.IsSuccess)
+                {
+                    ErrorMessage = updateResult.ErrorMessage;
+                    HasError = true;
+                    IsBusy = false;
+                    return;
+                }
+            }
             else
-                await db.Db.InsertAsync(vehicle);
+            {
+                var insertResult = await _vehicles.InsertAsync(vehicle);
+                if (!insertResult.IsSuccess)
+                {
+                    ErrorMessage = insertResult.ErrorMessage;
+                    HasError = true;
+                    IsBusy = false;
+                    return;
+                }
+            }
 
             IsBusy = false;
             await Shell.Current.GoToAsync("..");
         }
     }
 }
+
