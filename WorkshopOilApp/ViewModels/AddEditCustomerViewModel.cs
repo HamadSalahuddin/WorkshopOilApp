@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.Input;
 using WorkshopOilApp.Models;
 using WorkshopOilApp.Services;
 using WorkshopOilApp.Services.Repositories;
+using WorkshopOilApp.Views;
 
 namespace WorkshopOilApp.ViewModels;
 
@@ -137,6 +138,11 @@ public partial class AddEditCustomerViewModel : ObservableObject, IQueryAttribut
         ShowSuccess = true;
 
         await Task.Delay(1200);
-        await Shell.Current.GoToAsync("..");
+
+        var backRoute = CustomerId.HasValue
+            ? $"//{nameof(CustomerListPage)}/{nameof(CustomerDetailPage)}?customerId={CustomerId}"
+            : $"//{nameof(CustomerListPage)}";
+
+        await Shell.Current.GoToAsync(backRoute);
     }
 }

@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using WorkshopOilApp.Models;
 using WorkshopOilApp.Services.Repositories;
+using WorkshopOilApp.Views;
 
 namespace WorkshopOilApp.ViewModels
 {
@@ -160,7 +161,10 @@ namespace WorkshopOilApp.ViewModels
             }
 
             IsBusy = false;
-            await Shell.Current.GoToAsync("..");
+
+            // Return to the customer detail page explicitly to avoid ambiguous route resolution
+            var backRoute = $"//{nameof(CustomerListPage)}/{nameof(CustomerDetailPage)}?customerId={CustomerId}";
+            await Shell.Current.GoToAsync(backRoute);
         }
     }
 }

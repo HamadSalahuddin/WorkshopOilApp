@@ -17,6 +17,7 @@ namespace WorkshopOilApp
             Routing.RegisterRoute(nameof(AddEditVehiclePage), typeof(AddEditVehiclePage));
             Routing.RegisterRoute(nameof(LubricantListPage), typeof(LubricantListPage));
             Routing.RegisterRoute(nameof(AddEditLubricantPage), typeof(AddEditLubricantPage));
+            Routing.RegisterRoute(nameof(UserProfilePage), typeof(UserProfilePage));
             //    Routing.RegisterRoute(nameof(VehicleDetailPage.PageRoute, typeof(VehicleDetailPage));
             //Routing.RegisterRoute(nameof(OilChangeHistoryPage), typeof(OilChangeHistoryPage));
             //    Routing.RegisterRoute(nameof(AddEditCustomerPage), typeof(AddEditCustomerPage));

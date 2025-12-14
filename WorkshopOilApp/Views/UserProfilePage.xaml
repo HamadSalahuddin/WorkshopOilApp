@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:WorkshopOilApp.ViewModels"
+             x:Class="WorkshopOilApp.Views.UserProfilePage"
+             Title="User Profile"
+             BackgroundColor="{AppThemeBinding Light=#F8FAFC, Dark={StaticResource Gray950}}"
+             x:DataType="vm:UserProfileViewModel">
+
+    <ContentPage.BindingContext>
+        <vm:UserProfileViewModel />
+    </ContentPage.BindingContext>
+
+    <ScrollView>
+        <VerticalStackLayout Spacing="16" Padding="20">
+            <Frame BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray900}}"
+                   CornerRadius="12"
+                   HasShadow="True"
+                   Padding="16">
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="Personal Information"
+                           FontSize="18"
+                           FontAttributes="Bold"
+                           TextColor="{AppThemeBinding Light={StaticResource HeadingColorLight}, Dark={StaticResource HeadingColorDark}}" />
+
+                    <Entry Placeholder="First Name" Text="{Binding GivenName}" />
+                    <Entry Placeholder="Last Name" Text="{Binding LastName}" />
+                    <Entry Placeholder="Username" Text="{Binding UserName}" IsEnabled="False" />
+                    <Entry Placeholder="Passcode" Text="{Binding PassCode}" IsEnabled="False" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <Frame BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray900}}"
+                   CornerRadius="12"
+                   HasShadow="True"
+                   Padding="16">
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="Business Details"
+                           FontSize="18"
+                           FontAttributes="Bold"
+                           TextColor="{AppThemeBinding Light={StaticResource HeadingColorLight}, Dark={StaticResource HeadingColorDark}}" />
+
+                    <Entry Placeholder="Business Name" Text="{Binding BusinessName}" />
+                    <Entry Placeholder="Business Contact" Text="{Binding BusinessContact}" Keyboard="Telephone" />
+                    <Entry Placeholder="Business Email" Text="{Binding BusinessEmail}" Keyboard="Email" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <Button Text="Save Changes"
+                    Command="{Binding SaveCommand}"
+                    BackgroundColor="#3B82F6"
+                    TextColor="White"
+                    CornerRadius="12"
+                    HeightRequest="50"
+                    FontAttributes="Bold" />
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

@@ -4,16 +4,31 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:WorkshopOilApp.Views"
-    Shell.FlyoutBehavior="Flyout"
+    Shell.FlyoutBehavior="Disabled"
     Title="WorkshopOilApp">
 
-    <ShellContent Route="LoginPage" ContentTemplate="{DataTemplate local:LoginPage}" />
-    <ShellContent Route="RegisterPage" ContentTemplate="{DataTemplate local:RegisterPage}" />
-    <ShellContent Route="ForgotPasswordPage" ContentTemplate="{DataTemplate local:ForgotPasswordPage}" />
+    <ShellContent Route="LoginPage"
+                  ContentTemplate="{DataTemplate local:LoginPage}"
+                  Shell.FlyoutItemIsVisible="False" />
+    <ShellContent Route="RegisterPage"
+                  ContentTemplate="{DataTemplate local:RegisterPage}"
+                  Shell.FlyoutItemIsVisible="False" />
+    <ShellContent Route="ForgotPasswordPage"
+                  ContentTemplate="{DataTemplate local:ForgotPasswordPage}"
+                  Shell.FlyoutItemIsVisible="False" />
 
-    <!-- After login -->
-    <FlyoutItem Title="Customers" FlyoutDisplayOptions="AsMultipleItems">
-        <!--<ShellContent Route="CustomerListPage" ContentTemplate="{DataTemplate local:CustomerListPage}" />-->
+    <FlyoutItem Title="Customers">
+        <ShellContent Route="CustomerListPage" ContentTemplate="{DataTemplate local:CustomerListPage}" />
     </FlyoutItem>
+
+    <FlyoutItem Title="Lubricants">
+        <ShellContent Route="LubricantListPage" ContentTemplate="{DataTemplate local:LubricantListPage}" />
+    </FlyoutItem>
+
+    <FlyoutItem Title="User Profile">
+        <ShellContent Route="UserProfilePage" ContentTemplate="{DataTemplate local:UserProfilePage}" />
+    </FlyoutItem>
+
+    <MenuItem Text="Logout" Clicked="OnLogoutClicked" />
 
 </Shell>
