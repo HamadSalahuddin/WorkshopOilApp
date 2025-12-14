@@ -1,4 +1,7 @@
+using Microsoft.Maui.ApplicationModel;
 using WorkshopOilApp.ViewModels;
+using WorkshopOilApp.Services;
+using WorkshopOilApp;
 
 namespace WorkshopOilApp.Views;
 
@@ -8,9 +11,9 @@ public partial class CustomerListPage : ContentPage
     private const int SearchDelayMs = 600; // 0.6 seconds
 
     public CustomerListPage()
-	{
-		InitializeComponent();
-	}
+    {
+        InitializeComponent();
+    }
 
     protected override void OnAppearing()
     {
@@ -36,5 +39,24 @@ public partial class CustomerListPage : ContentPage
                 await vm.LoadCustomersCommand.ExecuteAsync(null);
             }
         }
+    }
+
+    protected override bool OnBackButtonPressed()
+    {
+        if (Navigation.NavigationStack.Count > 1)
+        {
+            return base.OnBackButtonPressed();
+        }
+
+        MainThread.BeginInvokeOnMainThread(async () =>
+        {
+            var confirm = await DisplayAlert("Logout", "Do you want to logout?", "Yes", "No");
+            if (confirm && Shell.Current is AppShell appShell)
+            {
+                await appShell.LogoutAsync();
+            }
+        });
+
+        return true;
     }
 }

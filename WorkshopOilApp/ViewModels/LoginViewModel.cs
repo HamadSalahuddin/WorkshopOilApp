@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.Input;
 using WorkshopOilApp.Services;
 using WorkshopOilApp.Views;
+using WorkshopOilApp;
 
 namespace WorkshopOilApp.ViewModels;
 
@@ -31,8 +32,13 @@ public partial class LoginViewModel : ObservableObject
 
         if (result.IsSuccess)
         {
+            AuthService.SetCurrentUser(result.Data);
+            if (Shell.Current is AppShell appShell)
+            {
+                appShell.SetAuthenticatedState();
+            }
             // Navigate to Customers List
-            await Shell.Current.GoToAsync(nameof(CustomerListPage));
+            await Shell.Current.GoToAsync($"//{nameof(CustomerListPage)}");
         }
         else
         {

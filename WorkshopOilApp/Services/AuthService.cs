@@ -8,6 +8,18 @@ public class AuthService
 {
     private readonly UserRepository _users = new();
 
+    public static Models.User? CurrentUser { get; private set; }
+
+    public static void Logout()
+    {
+        CurrentUser = null;
+    }
+
+    public static void SetCurrentUser(User? user)
+    {
+        CurrentUser = user;
+    }
+
     public async Task<Result<User>> LoginAsync(string username, string password)
     {
         if (string.IsNullOrWhiteSpace(username))
@@ -31,6 +43,7 @@ public class AuthService
             return Result<User>.Failure("Invalid username or password");
         }
 
+        CurrentUser = userResult.Data;
         return Result<User>.Success(userResult.Data);
     }
 
