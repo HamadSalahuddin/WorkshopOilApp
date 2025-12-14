@@ -98,7 +98,13 @@
                                                            WidthRequest="90"
                                                            HorizontalOptions="Start" />
                                                 </VerticalStackLayout>
-                                                
+
+                                                <Grid.GestureRecognizers>
+                                                    <TapGestureRecognizer
+                                                        Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.SelectCustomerCommand}"
+                                                        CommandParameter="{Binding Source={RelativeSource AncestorType={x:Type CollectionView}}, Path=BindingContext}" />
+                                                </Grid.GestureRecognizers>
+
                                             </Grid>
                                         </DataTemplate>
                                     </CollectionView.ItemTemplate>
