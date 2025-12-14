@@ -33,7 +33,7 @@ public partial class AddOilChangeViewModel : ObservableObject, IQueryAttributabl
     public DateTime MinimumNextDate => ChangeDate.AddDays(7);
 
     private int VehicleId { get; set; }
-    private int CustomerId { get; set; }
+    public int CustomerId { get; private set; }
 
     public string CustomerName => customer.FullName;
 

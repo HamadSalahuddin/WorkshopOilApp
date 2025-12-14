@@ -25,7 +25,7 @@ public partial class AddEditCustomerViewModel : ObservableObject, IQueryAttribut
     [ObservableProperty] bool isBusy;
     [ObservableProperty] bool showSuccess;
 
-    private int? CustomerId { get; set; }
+    public int? CustomerId { get; private set; }
 
     private readonly CustomerRepository _customers = new();
 

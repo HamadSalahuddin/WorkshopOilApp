@@ -98,7 +98,8 @@ public partial class CustomerDetailViewModel : ObservableObject, IQueryAttributa
     [RelayCommand]
     async Task ViewOilHistory(VehicleCardViewModel card)
     {
-        await Shell.Current.GoToAsync($"{nameof(OilChangeHistoryPage)}?vehicleId={card.Vehicle.VehicleId}");
+        var route = $"{nameof(OilChangeHistoryPage)}?vehicleId={card.Vehicle.VehicleId}&customerId={Customer.CustomerId}";
+        await Shell.Current.GoToAsync(route);
     }
 
     [RelayCommand]
