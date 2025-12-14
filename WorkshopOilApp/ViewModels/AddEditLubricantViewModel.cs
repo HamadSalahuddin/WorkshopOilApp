@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using WorkshopOilApp.Models;
 using WorkshopOilApp.Services.Repositories;
+using WorkshopOilApp.Views;
 
 namespace WorkshopOilApp.ViewModels;
 
@@ -129,7 +130,9 @@ public partial class AddEditLubricantViewModel : ObservableObject, IQueryAttribu
         }
 
         IsBusy = false;
-        await Shell.Current.GoToAsync("..");
+
+        var backRoute = $"//{nameof(LubricantListPage)}";
+        await Shell.Current.GoToAsync(backRoute);
     }
 }
 

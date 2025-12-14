@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using WorkshopOilApp.Models;
 using WorkshopOilApp.Services.Repositories;
+using WorkshopOilApp.Views;
 
 namespace WorkshopOilApp.ViewModels;
 
@@ -191,7 +192,8 @@ public partial class AddOilChangeViewModel : ObservableObject, IQueryAttributabl
 
         IsBusy = false;
 
-        await Shell.Current.GoToAsync("..");
+        var backRoute = $"//{nameof(CustomerListPage)}/{nameof(CustomerDetailPage)}?customerId={CustomerId}";
+        await Shell.Current.GoToAsync(backRoute);
     }
 }
 
