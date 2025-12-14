@@ -20,7 +20,10 @@ namespace WorkshopOilApp
         public void SetLoggedOutState()
         {
             FlyoutBehavior = FlyoutBehavior.Disabled;
-            Shell.Current.CurrentItem = Items.First();
+            if (Shell.Current?.Items?.FirstOrDefault() is ShellItem firstItem)
+            {
+                Shell.Current.CurrentItem = firstItem;
+            }
         }
 
         public async Task LogoutAsync()
