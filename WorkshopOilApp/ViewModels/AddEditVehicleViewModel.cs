@@ -31,7 +31,7 @@ namespace WorkshopOilApp.ViewModels
         [ObservableProperty] bool hasError;
         [ObservableProperty] bool isBusy;
 
-        private int CustomerId { get; set; }
+    public int CustomerId { get; private set; }
         private int? VehicleId { get; set; }
 
         private readonly VehicleRepository _vehicles = new();

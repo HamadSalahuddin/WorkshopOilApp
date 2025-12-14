@@ -6,6 +6,20 @@ namespace WorkshopOilApp.Services.Repositories;
 
 public class VehicleRepository : BaseRepository
 {
+    public async Task<Result<Vehicle>> GetByIdAsync(int vehicleId)
+    {
+        try
+        {
+            var db = await GetDbAsync().ConfigureAwait(false);
+            var vehicle = await db.GetAsync<Vehicle>(vehicleId).ConfigureAwait(false);
+            return Success(vehicle);
+        }
+        catch (Exception ex)
+        {
+            return Failure<Vehicle>($"Failed to load vehicle: {ex.Message}");
+        }
+    }
+
     public async Task<Result<Vehicle>> GetWithChildrenAsync(int vehicleId)
     {
         try

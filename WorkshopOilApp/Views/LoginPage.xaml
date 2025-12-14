@@ -2,7 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:WorkshopOilApp.ViewModels"
              x:Class="WorkshopOilApp.Views.LoginPage"
-             Title="Login"
+             Shell.NavBarIsVisible="False"
              BackgroundColor="{AppThemeBinding Light=#F5F5F5, Dark={StaticResource Gray950}}"
              x:DataType="vm:LoginViewModel">
 

@@ -25,7 +25,8 @@ public partial class OilChangeHistoryViewModel : ObservableObject, IQueryAttribu
 
     public DateTime Today => DateTime.Today;
 
-    private int VehicleId { get; set; }
+    public int VehicleId { get; private set; }
+    public int? CustomerId { get; private set; }
 
     private int _currentPage = 0;
     private bool _isLoadingMore = false;
@@ -33,6 +34,7 @@ public partial class OilChangeHistoryViewModel : ObservableObject, IQueryAttribu
 
     private readonly OilChangeRecordRepository _oilChanges = new();
     private readonly LubricantRepository _lubricants = new();
+    private readonly VehicleRepository _vehicles = new();
 
     public void ApplyQueryAttributes(IDictionary<string, object> query)
     {
@@ -40,6 +42,11 @@ public partial class OilChangeHistoryViewModel : ObservableObject, IQueryAttribu
         {
             VehicleId = Convert.ToInt32(id);
             _ = LoadHistoryAsync();
+        }
+
+        if (query.TryGetValue("customerId", out var customerId))
+        {
+            CustomerId = Convert.ToInt32(customerId);
         }
     }
 
@@ -128,6 +135,17 @@ public partial class OilChangeHistoryViewModel : ObservableObject, IQueryAttribu
     private async Task LoadHistoryAsync()
     {
         IsBusy = true;
+
+        if (CustomerId is null)
+        {
+            var vehicleResult = await _vehicles.GetByIdAsync(VehicleId);
+            if (vehicleResult.IsSuccess && vehicleResult.Data != null)
+            {
+                Vehicle = vehicleResult.Data;
+                CustomerId = vehicleResult.Data.CustomerId;
+            }
+        }
+
         await LoadPageAsync();
         IsBusy = false;
     }
