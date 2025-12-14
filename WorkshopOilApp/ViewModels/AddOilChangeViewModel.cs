@@ -22,7 +22,7 @@ public partial class AddOilChangeViewModel : ObservableObject, IQueryAttributabl
     [ObservableProperty] double cost;
     [ObservableProperty] string notes = "";
     [ObservableProperty] bool isBusy;
-    [ObservableProperty] private DateTime nextRecommendedDate;
+    [ObservableProperty] private DateTime nextRecommendedDate = DateTime.Today.AddMonths(3);
     [ObservableProperty] private string nextRecommendedKm = "";
     [ObservableProperty] private string saveErrorMessage = "";
     [ObservableProperty] private bool hasSaveError;
@@ -56,7 +56,7 @@ public partial class AddOilChangeViewModel : ObservableObject, IQueryAttributabl
 
     private void UpdateDuePreview()
     {
-        NextRecommendedDate = ChangeDate.AddMonths(12);  // default suggestion
+        NextRecommendedDate = ChangeDate.AddMonths(3);  // default suggestion
         OnPropertyChanged(nameof(MinimumNextDate));
     }
 
